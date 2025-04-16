@@ -4,6 +4,9 @@
 #include <QMainWindow>
 #include <QMessageBox>
 
+#define PUBLIC
+#define PRIVATE
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
