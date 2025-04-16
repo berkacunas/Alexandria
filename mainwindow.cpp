@@ -1,8 +1,7 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 
-#include <QMessageBox>
-
+#include "globalvars.h"
 #include "connection.h"
 
 PUBLIC MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
