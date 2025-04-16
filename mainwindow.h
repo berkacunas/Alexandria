@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QMessageBox>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -19,5 +20,12 @@ public:
 
 private:
     Ui::MainWindow *ui;
+
+    const QString _dbfile = "/home/valjean/Documents/Databases/Alexandria.db";
+    QMessageBox _msgBox;
+
+    int showMessageBox(const QString &title, const QString &text, QMessageBox::StandardButtons buttons = QMessageBox::Ok,
+                                                                 QMessageBox::StandardButton defaultButton = QMessageBox::NoButton);
+
 };
 #endif // MAINWINDOW_H
