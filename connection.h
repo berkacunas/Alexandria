@@ -5,7 +5,7 @@
 #include <QSqlError>
 #include <QSqlQuery>
 
-static bool createConnection(const QString filename)
+static bool createConnection(const QString &filename)
 {
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName(filename);

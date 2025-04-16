@@ -10,7 +10,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->setupUi(this);
     this->showMaximized();
 
-    if (createConnection(_dbfile)) {
+    if (!createConnection(_dbfile)) {
         this->showMessageBox("", "Cannot connect to SQLite !", QMessageBox::Ok, QMessageBox::Ok);
         return;
     }
