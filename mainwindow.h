@@ -2,7 +2,10 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QStandardPaths>
 #include <QMessageBox>
+#include <QKeyEvent>
+#include <QCloseEvent>
 
 
 QT_BEGIN_NAMESPACE
@@ -15,18 +18,24 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
+    Ui::MainWindow *ui;
+    QMessageBox _msgBox;
+
+    int showMessageBox(QMessageBox::Icon icon, const QString &title, const QString &text,
+                       QMessageBox::StandardButtons buttons = QMessageBox::Ok,
+                       QMessageBox::StandardButton defaultButton = QMessageBox::NoButton);
+
+    int showRegisteredQSqlDrivers();
+
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-private:
-    Ui::MainWindow *ui;
+    void keyPressEvent(QKeyEvent *event);
 
-    const QString _dbfile = "/home/valjean/Documents/Databases/Alexandria.db";
-    QMessageBox _msgBox;
-
-    int showMessageBox(const QString &title, const QString &text, QMessageBox::StandardButtons buttons = QMessageBox::Ok,
-                                                                 QMessageBox::StandardButton defaultButton = QMessageBox::NoButton);
+protected:
+    void closeEvent(QCloseEvent *event);
 
 };
+
 #endif // MAINWINDOW_H
