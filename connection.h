@@ -8,6 +8,28 @@
 #include <QDebug>
 #include <QStringList>
 #include <QFile>
+#include <QStandardPaths>
+
+static int createDatabase(const QString &dbname);
+static bool createConnection(const QString &filename);
+static QStringList QSqlDatabaseDrivers();
+static int execSqlScriptFile(QSqlDatabase &db, const QString &filename);
+
+const QString genericDataLocation = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation); //AppDataLocation
+const QString dbPath = genericDataLocation + "/Alexandria/";
+const QString defaultDbName = dbPath + "Alexandria.db";
+const QString createTableScript = dbPath + "Alexandria.CreateTables.sql";
+
+static int createDatabase(const QString &dbname)
+{
+    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+    db.setDatabaseName(dbname);
+    db.open();
+    if (!db.isOpen())
+        return 0;
+
+    return execSqlScriptFile(db, createTableScript);
+}
 
 static bool createConnection(const QString &filename)
 {

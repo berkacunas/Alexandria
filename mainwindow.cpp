@@ -12,27 +12,24 @@ PUBLIC MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui:
     ui->setupUi(this);
     this->showMaximized();
 
-    QString genericDataLocation = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation); //AppDataLocation
-    QString dbPath = genericDataLocation.append("/Alexandria/");
-
     if (!std::filesystem::is_directory(dbPath.toStdString()))
         if (!std::filesystem::create_directory(dbPath.toStdString()))
             this->showMessageBox(QMessageBox::Critical, "Error", "Cannot create database file path !", QMessageBox::Ok, QMessageBox::Ok);
 
-    QString dbFile = dbPath.append("Alexandria.db");
+    if (!std::filesystem::is_regular_file(defaultDbName.toStdString())) {
+        int count = createDatabase(defaultDbName);
+        this->showMessageBox(QMessageBox::Information, "Database Created", QString::fromStdString((std::to_string(count))) + " tables created.", QMessageBox::Ok);
+    }
 
-    if (!createConnection(dbFile))
+    if (!createConnection(defaultDbName))
         this->showMessageBox(QMessageBox::Critical, "Error", "Cannot connect to SQLite !", QMessageBox::Ok, QMessageBox::Ok);
 
-    this->showRegisteredQSqlDrivers();
+    std::string sqlDrivers = this->getRegisteredQSqlDrivers();
+    this->showMessageBox(QMessageBox::Information, "Registered QSqlDatabases", QString::fromStdString(sqlDrivers), QMessageBox::Ok, QMessageBox::Ok);
 
     ui->verticalLayoutMain->addStretch(1);
 
-    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName(dbFile);
-    db.open();
 
-    execSqlScriptFile(db, "./Sql/Alexandria.CreateTables.sql");
 }
 
 PRIVATE int MainWindow::showMessageBox(QMessageBox::Icon icon, const QString &title, const QString &text, QMessageBox::StandardButtons buttons, QMessageBox::StandardButton defaultButton)
@@ -46,7 +43,7 @@ PRIVATE int MainWindow::showMessageBox(QMessageBox::Icon icon, const QString &ti
     return _msgBox.exec();
 }
 
-PRIVATE int MainWindow::showRegisteredQSqlDrivers()
+PRIVATE std::string MainWindow::getRegisteredQSqlDrivers()
 {
     std::ostringstream ss;
     QStringList drivers = QSqlDatabaseDrivers();
@@ -58,8 +55,7 @@ PRIVATE int MainWindow::showRegisteredQSqlDrivers()
              ss << " ";
     }
 
-    std::string s = ss.str();
-    return this->showMessageBox(QMessageBox::Information, "Registered QSqlDatabases", QString::fromStdString(s), QMessageBox::Ok, QMessageBox::Ok);
+    return ss.str();
 }
 
 PUBLIC void MainWindow::keyPressEvent(QKeyEvent *event)

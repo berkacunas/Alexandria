@@ -1,3 +1,5 @@
+CREATE DATABASE Alexandria;
+
 CREATE TABLE IF NOT EXISTS "Continent" (
         "id"                INTEGER NOT NULL UNIQUE,
         "Name"              TEXT NOT NULL,

@@ -25,7 +25,7 @@ class MainWindow : public QMainWindow
                        QMessageBox::StandardButtons buttons = QMessageBox::Ok,
                        QMessageBox::StandardButton defaultButton = QMessageBox::NoButton);
 
-    int showRegisteredQSqlDrivers();
+    std::string getRegisteredQSqlDrivers();
 
 public:
     MainWindow(QWidget *parent = nullptr);
