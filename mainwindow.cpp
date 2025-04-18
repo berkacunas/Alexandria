@@ -9,12 +9,14 @@
 #include "globalvars.h"
 #include "connection.h"
 
+void libib_parse_callback(std::vector<std::string> wordList);
+
+
 PUBLIC MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
     this->showMaximized();
     ui->verticalLayoutMain->addStretch(1);
-
 
     action_NewDatabase = new QAction(QIcon::fromTheme(QIcon::ThemeIcon::DocumentNew), tr("&New"), this);
     action_NewDatabase->setShortcuts(QKeySequence::New);
@@ -30,6 +32,10 @@ PUBLIC MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui:
     action_DisplayDatabaseDrivers->setStatusTip(tr("Display database drivers"));
     connect(action_DisplayDatabaseDrivers, &QAction::triggered, this, &MainWindow::displayDatabaseDrivers);
 
+    action_importLibib = new QAction(QIcon(), tr("Import Libib Csv"), this);
+    action_importLibib->setStatusTip(tr("Import Libib Csv"));
+    connect(action_importLibib, &QAction::triggered, this, &MainWindow::importLibibCsv);
+
 
     menuBar = QMainWindow::menuBar();
 
@@ -38,6 +44,7 @@ PUBLIC MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui:
     fileMenu->addAction(action_OpenDatabase);
     fileMenu->addAction(action_DisplayDatabaseDrivers);
     fileMenu->addSeparator();
+    fileMenu->addAction(action_importLibib);
 
     editMenu = menuBar->addMenu(tr("&Edit"));
     viewMenu = menuBar->addMenu(tr("&View"));
@@ -67,8 +74,29 @@ PUBLIC MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui:
 
     QWidget *centralWidget = new QWidget(this);
     setCentralWidget(centralWidget);
+
+    foo();  // for test purposes.
 }
 
+PUBLIC void MainWindow::keyPressEvent(QKeyEvent *event)
+{
+    qDebug() << "MyLineEdit : keyPressEvent , key : " << event->text();
+
+    qDebug() << " ChildLineEdit,keyPressEvent , key : " << event->text();
+    qDebug() << "Event accepted : " << event->isAccepted();
+    event->ignore();
+}
+
+PROTECTED void MainWindow::closeEvent(QCloseEvent *event)
+{
+    event->accept();
+    qDebug() << "QCloseEvent : Application closed";
+}
+
+CALLBACK void libib_parse_callback(std::vector<std::string> wordList)
+{
+    qDebug() << QString::fromStdString(std::to_string(wordList.size()));
+}
 
 PUBLIC_SLOT void MainWindow::newDatabase()
 {
@@ -76,7 +104,7 @@ PUBLIC_SLOT void MainWindow::newDatabase()
         if (!std::filesystem::create_directory(dbPath.toStdString()))
             this->showMessageBox(QMessageBox::Critical, "Error", "Cannot create database file path !", QMessageBox::Ok, QMessageBox::Ok);
 
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"), dbPath, tr("SqLite File (*.db)"), nullptr, QFileDialog::DontUseNativeDialog);
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Create database..."), dbPath, tr("SqLite File (*.db)"), nullptr, QFileDialog::DontUseNativeDialog);
     if (fileName.isEmpty())
         return;
 
@@ -109,6 +137,15 @@ PUBLIC_SLOT void MainWindow::displayDatabaseDrivers()
     this->showMessageBox(QMessageBox::Information, "Registered QSqlDatabases", QString::fromStdString(sqlDrivers), QMessageBox::Ok, QMessageBox::Ok);
 }
 
+PUBLIC_SLOT void MainWindow::importLibibCsv()
+{
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), "C:\\berk\\Documents\\Databases\\Libib", tr("CSV file (*.csv)"));
+    if (fileName.isEmpty())
+        return;
+
+    _libibParser = new LibibParser(fileName.toStdString());
+    _libibParser->parse(',', libib_parse_callback);
+}
 
 PRIVATE int MainWindow::showMessageBox(QMessageBox::Icon icon, const QString &title, const QString &text, QMessageBox::StandardButtons buttons, QMessageBox::StandardButton defaultButton)
 {
@@ -130,26 +167,17 @@ PRIVATE std::string MainWindow::getRegisteredQSqlDrivers()
     for (int i = 0; i < length; ++i) {
         ss << drivers[i].toStdString();
         if (i < length - 1)
-             ss << " ";
+            ss << " ";
     }
 
     return ss.str();
 }
 
-PUBLIC void MainWindow::keyPressEvent(QKeyEvent *event)
+PRIVATE void MainWindow::foo()
 {
-    qDebug() << "MyLineEdit : keyPressEvent , key : " << event->text();
-
-    qDebug() << " ChildLineEdit,keyPressEvent , key : " << event->text();
-    qDebug() << "Event accepted : " << event->isAccepted();
-    event->ignore();
+    // For test purposes.
 }
 
-void MainWindow::closeEvent(QCloseEvent *event)
-{
-    event->accept();
-    qDebug() << "QCloseEvent : Application closed";
-}
 
 MainWindow::~MainWindow()
 {

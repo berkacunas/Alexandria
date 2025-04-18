@@ -3,7 +3,8 @@
 
 #define PUBLIC
 #define PRIVATE
-
+#define PROTECTED
+#define CALLBACK
 #define PUBLIC_SLOT
 
 #endif // GLOBALVARS_H

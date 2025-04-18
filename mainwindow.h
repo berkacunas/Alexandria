@@ -10,6 +10,7 @@
 #include <QKeyEvent>
 #include <QCloseEvent>
 
+#include "libibparser.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -24,9 +25,14 @@ class MainWindow : public QMainWindow
     Ui::MainWindow *ui;
     QMessageBox _msgBox;
 
+    LibibParser *_libibParser;
+
+    void foo(); // Test Func
+
     QAction *action_NewDatabase;
     QAction *action_OpenDatabase;
     QAction *action_DisplayDatabaseDrivers;
+    QAction *action_importLibib;
 
     QMenuBar *menuBar;
     QMenu *fileMenu;
@@ -35,7 +41,6 @@ class MainWindow : public QMainWindow
     QMenu *toolsMenu;
     QMenu *windowMenu;
     QMenu *helpMenu;
-
 
     QToolBar *fileToolBar;
 
@@ -61,6 +66,7 @@ public slots:
     void newDatabase();
     void openDatabase();
     void displayDatabaseDrivers();
+    void importLibibCsv();
 
 };
 
