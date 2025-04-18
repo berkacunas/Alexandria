@@ -36,6 +36,11 @@ public:
 protected:
     void closeEvent(QCloseEvent *event);
 
+public slots:
+    void action_NewDatabaseHandler();
+    void action_OpenDatabaseHandler();
+    void action_DisplayDatabaseDriversHandler();
+
 };
 
 #endif // MAINWINDOW_H

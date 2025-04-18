@@ -4,4 +4,6 @@
 #define PUBLIC
 #define PRIVATE
 
+#define PUBLIC_SLOT
+
 #endif // GLOBALVARS_H

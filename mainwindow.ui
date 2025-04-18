@@ -43,7 +43,9 @@
     <property name="title">
      <string>&amp;File</string>
     </property>
-    <addaction name="action_Open"/>
+    <addaction name="action_NewDatabase"/>
+    <addaction name="action_OpenDatabase"/>
+    <addaction name="action_DisplayDatabaseDrivers"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
@@ -72,9 +74,19 @@
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="action_Open">
+  <action name="action_OpenDatabase">
    <property name="text">
-    <string>&amp;Open</string>
+    <string>&amp;Open Database</string>
+   </property>
+  </action>
+  <action name="action_NewDatabase">
+   <property name="text">
+    <string>&amp;New Database...</string>
+   </property>
+  </action>
+  <action name="action_DisplayDatabaseDrivers">
+   <property name="text">
+    <string>Display Database Drivers</string>
    </property>
   </action>
  </widget>

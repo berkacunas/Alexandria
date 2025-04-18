@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 
+#include <QFileDialog>
 #include <filesystem>
 #include <sstream>
 
@@ -11,26 +12,42 @@ PUBLIC MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui:
 {
     ui->setupUi(this);
     this->showMaximized();
+    ui->verticalLayoutMain->addStretch(1);
 
+    QObject::connect(ui->action_NewDatabase, SIGNAL(triggered()), this, SLOT(action_NewDatabaseHandler()));
+    QObject::connect(ui->action_DisplayDatabaseDrivers, SIGNAL(triggered()), this, SLOT(action_DisplayDatabaseDriversHandler()));
+
+}
+
+
+PUBLIC_SLOT void MainWindow::action_NewDatabaseHandler()
+{
     if (!std::filesystem::is_directory(dbPath.toStdString()))
         if (!std::filesystem::create_directory(dbPath.toStdString()))
             this->showMessageBox(QMessageBox::Critical, "Error", "Cannot create database file path !", QMessageBox::Ok, QMessageBox::Ok);
 
-    if (!std::filesystem::is_regular_file(defaultDbName.toStdString())) {
-        int count = createDatabase(defaultDbName);
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"), dbPath, tr("SqLite File (*.db)"), nullptr, QFileDialog::DontUseNativeDialog);
+
+    if (!std::filesystem::is_regular_file(fileName.toStdString())) {
+        int count = createDatabase(fileName);
         this->showMessageBox(QMessageBox::Information, "Database Created", QString::fromStdString((std::to_string(count))) + " tables created.", QMessageBox::Ok);
     }
 
-    if (!createConnection(defaultDbName))
+    if (!createConnection(fileName))
         this->showMessageBox(QMessageBox::Critical, "Error", "Cannot connect to SQLite !", QMessageBox::Ok, QMessageBox::Ok);
+}
 
-    std::string sqlDrivers = this->getRegisteredQSqlDrivers();
-    this->showMessageBox(QMessageBox::Information, "Registered QSqlDatabases", QString::fromStdString(sqlDrivers), QMessageBox::Ok, QMessageBox::Ok);
-
-    ui->verticalLayoutMain->addStretch(1);
-
+PUBLIC_SLOT void MainWindow::action_OpenDatabaseHandler()
+{
 
 }
+
+PUBLIC_SLOT void MainWindow::action_DisplayDatabaseDriversHandler()
+{
+    std::string sqlDrivers = this->getRegisteredQSqlDrivers();
+    this->showMessageBox(QMessageBox::Information, "Registered QSqlDatabases", QString::fromStdString(sqlDrivers), QMessageBox::Ok, QMessageBox::Ok);
+}
+
 
 PRIVATE int MainWindow::showMessageBox(QMessageBox::Icon icon, const QString &title, const QString &text, QMessageBox::StandardButtons buttons, QMessageBox::StandardButton defaultButton)
 {

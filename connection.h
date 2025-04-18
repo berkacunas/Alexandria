@@ -56,8 +56,7 @@ static int execSqlScriptFile(QSqlDatabase &db, const QString &filename)
 
     int successCount = 0;
     foreach(const QString &statement, sqlStatements) {
-        if (statement.trimmed() != "")
-        {
+        if (statement.trimmed() != "") {
             QSqlQuery query(db);
             if (query.exec(statement))
                 successCount++;
