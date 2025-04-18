@@ -14,7 +14,7 @@ PUBLIC LibibCollection::LibibCollection()
 PUBLIC Libib LibibCollection::parseLine(std::vector<std::string> line)
 {
     Libib libib;
-    const std::string dateStrFormat = "%Y-%m-%d";
+    const std::string dateStrFormat = "%YYYY-%mm-%dd";
 
 
     libib.ItemType = line[0];
@@ -22,8 +22,13 @@ PUBLIC Libib LibibCollection::parseLine(std::vector<std::string> line)
     libib.Creators = line[2];
     libib.FirstName = line[3];
     libib.LastName = line[4];
-    libib.EAN_ISBN13 = atoi(line[5].c_str());
-    libib.UPC_ISBN10 = line[6];
+
+    std::istringstream ss_EAN_ISBN13(line[5]);
+    ss_EAN_ISBN13 >> libib.EAN_ISBN13;
+
+    std::istringstream ss_UPC_ISBN10(line[6]);
+    ss_UPC_ISBN10 >> libib.UPC_ISBN10;
+
     libib.Description = line[7];
     libib.Publisher = line[8];
 
@@ -33,7 +38,10 @@ PUBLIC Libib LibibCollection::parseLine(std::vector<std::string> line)
     libib.Group = line[10];
     libib.Tags = line[11];
     libib.Notes = line[12];
-    libib.Price =  std::stoul(line[13].c_str());
+
+    std::istringstream ss_Price(line[13]);
+    ss_Price >> libib.Price;
+
     libib.Length = atoi(line[14].c_str());
     libib.NumberOfDiscs = atoi(line[15].c_str());
     libib.NumberOfPlayers = atoi(line[16].c_str());
@@ -41,7 +49,10 @@ PUBLIC Libib LibibCollection::parseLine(std::vector<std::string> line)
     libib.Ensemble = line[18];
     libib.AspectRatio = line[19];
     libib.ESRB = line[20];
-    libib.Rating = std::stoul(line[21].c_str());
+
+    std::istringstream ss_Rating(line[21]);
+    ss_Rating >> libib.Rating;
+
     libib.Review = line[22];
 
     std::istringstream ss_reviewDate(line[23]);

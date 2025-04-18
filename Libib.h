@@ -13,15 +13,15 @@ public:
     std::string Creators;
     std::string FirstName;
     std::string LastName;
-    std::string EAN_ISBN13;
-    std::string UPC_ISBN10;
+    unsigned long EAN_ISBN13;
+    unsigned long UPC_ISBN10;
     std::string Description;
     std::string Publisher;
     tm PublishDate;
     std::string Group;
     std::string Tags;
     std::string Notes;
-    unsigned long int Price;
+    unsigned long Price;
     int Length;
     int NumberOfDiscs;
     int NumberOfPlayers;
@@ -29,7 +29,7 @@ public:
     std::string AspectRatio;
     std::string Ensemble;
     std::string ESRB;
-    unsigned long int Rating;
+    unsigned long Rating;
     std::string Review;
     tm ReviewDate;
     std::string Status ;
