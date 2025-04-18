@@ -49,7 +49,7 @@ class MainWindow : public QMainWindow
 
     int showMessageBox(QMessageBox::Icon icon, const QString &title, const QString &text,
                        QMessageBox::StandardButtons buttons = QMessageBox::Ok,
-                       QMessageBox::StandardButton defaultButton = QMessageBox::NoButton);
+                       QMessageBox::StandardButton defaultButton = QMessageBox::Ok);
 
     std::string getRegisteredQSqlDrivers();
 
