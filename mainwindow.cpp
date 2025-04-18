@@ -2,6 +2,7 @@
 #include "./ui_mainwindow.h"
 
 #include <QFileDialog>
+
 #include <filesystem>
 #include <sstream>
 
@@ -14,19 +15,57 @@ PUBLIC MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui:
     this->showMaximized();
     ui->verticalLayoutMain->addStretch(1);
 
-    QObject::connect(ui->action_NewDatabase, SIGNAL(triggered()), this, SLOT(action_NewDatabaseHandler()));
-    QObject::connect(ui->action_DisplayDatabaseDrivers, SIGNAL(triggered()), this, SLOT(action_DisplayDatabaseDriversHandler()));
+
+    action_NewDatabase = new QAction(QIcon::fromTheme(QIcon::ThemeIcon::DocumentNew), tr("&New"), this);
+    action_NewDatabase->setShortcuts(QKeySequence::New);
+    action_NewDatabase->setStatusTip(tr("Create a new database"));
+    connect(action_NewDatabase, &QAction::triggered, this, &MainWindow::newDatabase);
+
+    action_OpenDatabase = new QAction(QIcon::fromTheme(QIcon::ThemeIcon::DocumentOpen), tr("&Open..."), this);
+    action_OpenDatabase->setShortcuts(QKeySequence::Open);
+    action_OpenDatabase->setStatusTip(tr("Open an existing database"));
+    connect(action_OpenDatabase, &QAction::triggered, this, &MainWindow::openDatabase);
+
+    action_DisplayDatabaseDrivers = new QAction(QIcon(), tr("&Display..."), this);
+    action_DisplayDatabaseDrivers->setStatusTip(tr("Display database drivers"));
+    connect(action_DisplayDatabaseDrivers, &QAction::triggered, this, &MainWindow::displayDatabaseDrivers);
+
+
+    menuBar = QMainWindow::menuBar();
+
+    fileMenu = menuBar->addMenu(tr("&File"));
+    fileMenu->addAction(action_NewDatabase);
+    fileMenu->addAction(action_OpenDatabase);
+    fileMenu->addAction(action_DisplayDatabaseDrivers);
+    fileMenu->addSeparator();
+
+
+    fileToolBar = new QToolBar();
+    fileToolBar->addAction(action_NewDatabase);
+    fileToolBar->addAction(action_OpenDatabase);
+    fileToolBar->setAllowedAreas(Qt::TopToolBarArea | Qt::BottomToolBarArea);
+    this->addToolBar(Qt::TopToolBarArea, fileToolBar);
+
+
+    contentsWindow = new QDockWidget(tr("Table of Contents"), this);
+    contentsWindow->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    addDockWidget(Qt::LeftDockWidgetArea, contentsWindow);
+
+    headingList = new QListWidget(contentsWindow);
+    contentsWindow->setWidget(headingList);
 
 }
 
 
-PUBLIC_SLOT void MainWindow::action_NewDatabaseHandler()
+PUBLIC_SLOT void MainWindow::newDatabase()
 {
     if (!std::filesystem::is_directory(dbPath.toStdString()))
         if (!std::filesystem::create_directory(dbPath.toStdString()))
             this->showMessageBox(QMessageBox::Critical, "Error", "Cannot create database file path !", QMessageBox::Ok, QMessageBox::Ok);
 
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"), dbPath, tr("SqLite File (*.db)"), nullptr, QFileDialog::DontUseNativeDialog);
+    if (fileName.isEmpty())
+        return;
 
     if (!std::filesystem::is_regular_file(fileName.toStdString())) {
         int count = createDatabase(fileName);
@@ -37,12 +76,21 @@ PUBLIC_SLOT void MainWindow::action_NewDatabaseHandler()
         this->showMessageBox(QMessageBox::Critical, "Error", "Cannot connect to SQLite !", QMessageBox::Ok, QMessageBox::Ok);
 }
 
-PUBLIC_SLOT void MainWindow::action_OpenDatabaseHandler()
+PUBLIC_SLOT void MainWindow::openDatabase()
 {
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), dbPath, tr("SqLite File (*.db)"), nullptr, QFileDialog::DontUseNativeDialog);
+    if (fileName.isEmpty())
+        return;
 
+    if (!createConnection(fileName)) {
+        this->showMessageBox(QMessageBox::Critical, "Error", "Cannot connect to SQLite !", QMessageBox::Ok, QMessageBox::Ok);
+        return;
+    }
+
+    this->showMessageBox(QMessageBox::Information, "Connected", "Connected to " + fileName, QMessageBox::Ok, QMessageBox::Ok);
 }
 
-PUBLIC_SLOT void MainWindow::action_DisplayDatabaseDriversHandler()
+PUBLIC_SLOT void MainWindow::displayDatabaseDrivers()
 {
     std::string sqlDrivers = this->getRegisteredQSqlDrivers();
     this->showMessageBox(QMessageBox::Information, "Registered QSqlDatabases", QString::fromStdString(sqlDrivers), QMessageBox::Ok, QMessageBox::Ok);

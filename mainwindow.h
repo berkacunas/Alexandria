@@ -2,6 +2,9 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QToolBar>
+#include <QDockWidget>
+#include <QListWidget>
 #include <QStandardPaths>
 #include <QMessageBox>
 #include <QKeyEvent>
@@ -21,6 +24,18 @@ class MainWindow : public QMainWindow
     Ui::MainWindow *ui;
     QMessageBox _msgBox;
 
+    QAction *action_NewDatabase;
+    QAction *action_OpenDatabase;
+    QAction *action_DisplayDatabaseDrivers;
+
+    QMenuBar *menuBar;
+    QMenu *fileMenu;
+
+    QToolBar *fileToolBar;
+
+    QDockWidget *contentsWindow;
+    QListWidget *headingList;
+
     int showMessageBox(QMessageBox::Icon icon, const QString &title, const QString &text,
                        QMessageBox::StandardButtons buttons = QMessageBox::Ok,
                        QMessageBox::StandardButton defaultButton = QMessageBox::NoButton);
@@ -37,9 +52,9 @@ protected:
     void closeEvent(QCloseEvent *event);
 
 public slots:
-    void action_NewDatabaseHandler();
-    void action_OpenDatabaseHandler();
-    void action_DisplayDatabaseDriversHandler();
+    void newDatabase();
+    void openDatabase();
+    void displayDatabaseDrivers();
 
 };
 
