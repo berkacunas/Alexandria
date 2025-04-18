@@ -30,6 +30,12 @@ class MainWindow : public QMainWindow
 
     QMenuBar *menuBar;
     QMenu *fileMenu;
+    QMenu *editMenu;
+    QMenu *viewMenu;
+    QMenu *toolsMenu;
+    QMenu *windowMenu;
+    QMenu *helpMenu;
+
 
     QToolBar *fileToolBar;
 

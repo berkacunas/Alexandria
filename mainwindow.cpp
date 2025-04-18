@@ -39,6 +39,12 @@ PUBLIC MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui:
     fileMenu->addAction(action_DisplayDatabaseDrivers);
     fileMenu->addSeparator();
 
+    editMenu = menuBar->addMenu(tr("&Edit"));
+    viewMenu = menuBar->addMenu(tr("&View"));
+    toolsMenu = menuBar->addMenu(tr("&Tools"));
+    windowMenu = menuBar->addMenu(tr("&Window"));
+    helpMenu = menuBar->addMenu(tr("&Help"));
+
 
     fileToolBar = new QToolBar();
     fileToolBar->addAction(action_NewDatabase);
