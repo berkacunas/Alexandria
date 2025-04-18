@@ -44,7 +44,7 @@ PUBLIC MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui:
     fileToolBar->addAction(action_NewDatabase);
     fileToolBar->addAction(action_OpenDatabase);
     fileToolBar->setAllowedAreas(Qt::TopToolBarArea | Qt::BottomToolBarArea);
-    this->addToolBar(Qt::TopToolBarArea, fileToolBar);
+    addToolBar(Qt::TopToolBarArea, fileToolBar);
 
 
     contentsWindow = new QDockWidget(tr("Table of Contents"), this);
@@ -54,6 +54,13 @@ PUBLIC MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui:
     headingList = new QListWidget(contentsWindow);
     contentsWindow->setWidget(headingList);
 
+    setCorner(Qt::TopLeftCorner, Qt::LeftDockWidgetArea);
+    setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
+    setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
+    setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
+
+    QWidget *centralWidget = new QWidget(this);
+    setCentralWidget(centralWidget);
 }
 
 
