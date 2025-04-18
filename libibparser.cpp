@@ -3,12 +3,12 @@
 #include <fstream>
 #include <sstream>
 
-LibibParser::LibibParser(std::string &csvFile)
+LibibParser::LibibParser(std::string csvFile)
 {
     _csvFile = csvFile;
 }
 
-void LibibParser::setCsvFile(std::string &csvFile) { _csvFile = csvFile; }
+void LibibParser::setCsvFile(std::string csvFile) { _csvFile = csvFile; }
 std::string LibibParser::CsvFile() { return _csvFile; }
 
 std::vector<std::vector<std::string>> LibibParser::parse(char delimeter, void (*callback)(std::vector<std::string>))
@@ -20,7 +20,9 @@ std::vector<std::vector<std::string>> LibibParser::parse(char delimeter, void (*
     try {
         ifs.open(_csvFile);
 
-        while (getline(ifs, line)) {
+        for (int i = 0; getline(ifs, line); ++i) {
+            if (i == 0)
+                continue;
             std::stringstream ss(line);
             std::string word;
             char del = delimeter;

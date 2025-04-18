@@ -8,6 +8,7 @@
 
 #include "globalvars.h"
 #include "connection.h"
+#include "LibibCollection.h"
 
 void libib_parse_callback(std::vector<std::string> wordList);
 
@@ -95,7 +96,11 @@ PROTECTED void MainWindow::closeEvent(QCloseEvent *event)
 
 CALLBACK void libib_parse_callback(std::vector<std::string> wordList)
 {
-    qDebug() << QString::fromStdString(std::to_string(wordList.size()));
+    LibibCollection libibCollection;
+    Libib libib = libibCollection.parseLine(wordList);
+    libibCollection.addItem(libib);
+
+    // qDebug() << QString::fromStdString(std::to_string(wordList.size()));
 }
 
 PUBLIC_SLOT void MainWindow::newDatabase()

@@ -16,8 +16,7 @@ std::chrono::system_clock::time_point GFG(const std::string& datetimeString, con
     tm tmStruct = {};
     std::istringstream ss(datetimeString);
     ss >> std::get_time(&tmStruct, format.c_str());
-    return std::chrono::system_clock::from_time_t(
-        mktime(&tmStruct));
+    return std::chrono::system_clock::from_time_t(mktime(&tmStruct));
 }
 
 // Function to format a time_t value into a date or time string.
@@ -29,6 +28,14 @@ static std::string DateTime(const std::chrono::system_clock::time_point &timePoi
     strftime(buffer, sizeof(buffer), format.c_str(), timeinfo);
 
     return buffer;
+}
+
+static std::string convertTmToString(tm &tm)
+{
+    time_t date = mktime(&tm);
+
+    // Output the parsed date using std::asctime
+    return asctime(localtime(&date));
 }
 
 /* Test Code

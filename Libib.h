@@ -2,13 +2,14 @@
 #define LIBIB_H
 
 #include <string>
+#include <ctime>
 
 class Libib {
 
 public:
 
     std::string ItemType;
-    std::string Title ;
+    std::string Title;
     std::string Creators;
     std::string FirstName;
     std::string LastName;
@@ -16,21 +17,25 @@ public:
     std::string UPC_ISBN10;
     std::string Description;
     std::string Publisher;
-    struct tm PublishDate;
+    tm PublishDate;
     std::string Group;
     std::string Tags;
     std::string Notes;
-    long long int Price;
+    unsigned long int Price;
     int Length;
+    int NumberOfDiscs;
+    int NumberOfPlayers;
+    int AgeGroup;
+    std::string AspectRatio;
     std::string Ensemble;
     std::string ESRB;
-    long long int Rating;
+    unsigned long int Rating;
     std::string Review;
-    std::string ReviewDate;
+    tm ReviewDate;
     std::string Status ;
-    std::string Began;
-    std::string Completed;
-    std::string Added;
+    tm Began;
+    tm Completed;
+    tm Added;
     int Copies;
  };
 
