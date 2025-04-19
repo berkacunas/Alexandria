@@ -11,23 +11,19 @@ PUBLIC LibibCollection::LibibCollection()
 
 }
 
-PUBLIC Libib LibibCollection::parseLine(std::vector<std::string> line)
+PUBLIC Libib LibibCollection::readLine(const std::vector<std::string> &line)
 {
     Libib libib;
-    const std::string dateStrFormat = "%YYYY-%mm-%dd";
-
+    const std::string dateStrFormat = "%Y-%m-%d";
 
     libib.ItemType = line[0];
     libib.Title = line[1];
     libib.Creators = line[2];
     libib.FirstName = line[3];
     libib.LastName = line[4];
-
-    std::istringstream ss_EAN_ISBN13(line[5]);
-    ss_EAN_ISBN13 >> libib.EAN_ISBN13;
-
-    std::istringstream ss_UPC_ISBN10(line[6]);
-    ss_UPC_ISBN10 >> libib.UPC_ISBN10;
+    const std::string &s = line[5];
+    libib.EAN_ISBN13 = std::stoull(line[5], nullptr, 0);
+    libib.UPC_ISBN10 = std::stoull(line[6], nullptr, 0);
 
     libib.Description = line[7];
     libib.Publisher = line[8];
@@ -66,8 +62,15 @@ PUBLIC Libib LibibCollection::parseLine(std::vector<std::string> line)
     std::istringstream ss_Completed(line[26]);
     ss_Completed >> std::get_time(&libib.Completed, dateStrFormat.c_str());
 
+
+    std::istringstream ss("01-01-2000 00:00:00");
+    tm time;
+    ss >> std::get_time(&time, "%d-%m-%Y %H:%M:%S");
+
     std::istringstream ss_Added(line[27]);
     ss_Added >> std::get_time(&libib.Added, dateStrFormat.c_str());
+    libib.Added.tm_mon += 1;
+    libib.Added.tm_year += 1900;
 
     libib.Copies = atoi(line[28].c_str());
 

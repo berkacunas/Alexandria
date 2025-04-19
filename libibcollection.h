@@ -13,7 +13,7 @@ class LibibCollection
 public:
     LibibCollection();
 
-    Libib parseLine(std::vector<std::string> line);
+    Libib readLine(const std::vector<std::string> &line);
     void addItem(Libib &libib);
 };
 

@@ -33,6 +33,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         datetimechrono.h
         libibparser.h libibparser.cpp
         libibcollection.h libibcollection.cpp
+        libib.cpp
 
     )
 # Define target properties for Android with Qt 6 as:

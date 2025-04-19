@@ -97,10 +97,14 @@ PROTECTED void MainWindow::closeEvent(QCloseEvent *event)
 CALLBACK void libib_parse_callback(std::vector<std::string> wordList)
 {
     LibibCollection libibCollection;
-    Libib libib = libibCollection.parseLine(wordList);
-    libibCollection.addItem(libib);
 
-    // qDebug() << QString::fromStdString(std::to_string(wordList.size()));
+    try {
+        Libib libib = libibCollection.readLine(wordList);
+        libibCollection.addItem(libib);
+    }
+    catch (std::exception &r) {
+        qDebug() << r.what();
+    }
 }
 
 PUBLIC_SLOT void MainWindow::newDatabase()
