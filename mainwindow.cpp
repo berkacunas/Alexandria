@@ -98,12 +98,14 @@ CALLBACK void libib_parse_callback(std::vector<std::string> wordList)
 {
     LibibCollection libibCollection;
 
+    Libib libib;
+
     try {
-        Libib libib = libibCollection.readLine(wordList);
+        libib = libibCollection.readLine(wordList);
         libibCollection.addItem(libib);
     }
     catch (std::exception &r) {
-        qDebug() << r.what();
+        qDebug() << QString::fromStdString(std::string(r.what()).append(" " + libib.Title()));
     }
 }
 
@@ -153,7 +155,33 @@ PUBLIC_SLOT void MainWindow::importLibibCsv()
         return;
 
     _libibParser = new LibibParser(fileName.toStdString());
-    _libibParser->parse(',', libib_parse_callback);
+    std::vector<std::vector<std::string>> wordLists = _libibParser->parse(',', libib_parse_callback);
+
+    LibibCollection libibs;
+    for (int i = 0; i < wordLists.size(); ++i) {
+        Libib libib = libibs.readLine(wordLists[i]);
+        libibs.addItem(libib);
+
+        QSqlQuery query;
+        query.prepare(QString("INSERT INTO Book(id, Name, Pages, PublisherId, LanguageId, ShopId, IsRead, LastReadDate, Price, PurchasedDay, AddDate)) ") +
+                      QString("VALUES (:id, :Name, :Pages, :PublisherId, :LanguageId, :ShopId, :IsRead, :LastReadDate, :Price, :PurchasedDay, :AddDate)"));
+
+        query.bindValue(":Name", QString::fromStdString(libib.Title()));
+        query.bindValue(":Pages", 1);
+
+        query.bindValue(":PublisherId", 1);
+        query.bindValue(":LanguageId", 1);
+        query.bindValue(":ShopId", 1);
+        query.bindValue(":IsRead", false);
+        query.bindValue(":LastReadDate", QString::fromStdString(std::to_string(libib.Completed().tm_wday) + std::to_string(libib.Completed().tm_mon) + std::to_string(libib.Completed().tm_year)));
+        query.bindValue(":Price", libib.Price());
+        query.bindValue(":PurchasedDay", QString::fromStdString(std::to_string(libib.PublishDate().tm_wday) + std::to_string(libib.PublishDate().tm_mon) + std::to_string(libib.PublishDate().tm_year)));
+        query.bindValue(":AddDate", QString::fromStdString(std::to_string(libib.Added().tm_wday) + std::to_string(libib.Added().tm_mon) + std::to_string(libib.Added().tm_year)));
+
+        query.exec();
+    }
+
+
 }
 
 PRIVATE int MainWindow::showMessageBox(QMessageBox::Icon icon, const QString &title, const QString &text, QMessageBox::StandardButtons buttons, QMessageBox::StandardButton defaultButton)

@@ -23,16 +23,30 @@ std::vector<std::vector<std::string>> LibibParser::parse(char delimeter, void (*
         for (int i = 0; getline(ifs, line); ++i) {
             if (i == 0)
                 continue;
+
+            bool inQuotes = false;
+
             std::stringstream ss(line);
             std::string word;
             char del = delimeter;
 
             std::vector<std::string> wordList;
-            while (getline(ss, word, del))
-                wordList.push_back(word);
+            // while (getline(ss, word, del))
+            //    wordList.push_back(word);
 
-            if (callback != NULL)
-                callback(wordList);
+            for (int k = 0; k < line.size(); ++k) {
+                if (!inQuotes && line[k] == del) {
+                    wordList.push_back(word);
+                    word.clear();
+                }
+                else if (line[k] == '"')
+                    inQuotes = !inQuotes;
+                else
+                    word += line[k];
+            }
+
+            // if (callback != NULL)
+            //   callback(wordList);
 
             wordLists.push_back(wordList);
         }

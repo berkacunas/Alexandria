@@ -1,5 +1,8 @@
 #include "Libib.h"
 
+
+#include <iomanip>
+#include <sstream>
 #include "globalvars.h"
 
 PUBLIC Libib::Libib()
@@ -44,7 +47,16 @@ PUBLIC void Libib::setEAN_ISBN13(unsigned long long EAN_ISBN13) { _EAN_ISBN13 = 
 PUBLIC void Libib::setUPC_ISBN10(unsigned long long UPC_ISBN10) { UPC_ISBN10 = UPC_ISBN10; }
 PUBLIC void Libib::setDescription(std::string description) { _description = description; }
 PUBLIC void Libib::setPublisher(std::string publisher) { _publisher = publisher; }
-PUBLIC void Libib::setPublishDate(tm publishDate) { _publishDate = publishDate; }
+
+PUBLIC void Libib::setPublishDate(std::string publishDateStr)
+{
+    std::istringstream ss(publishDateStr);
+    ss >> std::get_time(&_publishDate, dateformat);
+
+    _added.tm_mon += 1;
+    _added.tm_year += 1900;
+}
+
 PUBLIC void Libib::setGroup(std::string group) { _group = group; }
 PUBLIC void Libib::setTags(std::string tags) { _tags = tags; }
 PUBLIC void Libib::setNotes(std::string notes) { _notes = notes; }
@@ -58,11 +70,45 @@ PUBLIC void Libib::setEnsemble(std::string ensemble) { _ensemble = ensemble; }
 PUBLIC void Libib::setESRB(std::string ESRB) {_ESRB = ESRB;  }
 PUBLIC void Libib::setRating(double rating) { _rating = rating; }
 PUBLIC void Libib::setReview(std::string review) { _review = review; }
-PUBLIC void Libib::setReviewDate(tm reviewDate) { _reviewDate = reviewDate; }
+
+PUBLIC void Libib::setReviewDate(std::string reviewDateStr)
+{
+    std::istringstream ss(reviewDateStr);
+    ss >> std::get_time(&_reviewDate, dateformat);
+
+    _added.tm_mon += 1;
+    _added.tm_year += 1900;
+}
+
 PUBLIC void Libib::setStatus(std::string status) { _status = status; }
-PUBLIC void Libib::setBegan(tm began) { _began = began }
-PUBLIC void Libib::setCompleted(tm completed) { _completed = completed; }
-PUBLIC void Libib::setAdded(tm added) { _added = added; }
+
+PUBLIC void Libib::setBegan(std::string beganStr)
+{
+    std::istringstream ss(beganStr);
+    ss >> std::get_time(&_began, dateformat);
+
+    _added.tm_mon += 1;
+    _added.tm_year += 1900;
+}
+
+PUBLIC void Libib::setCompleted(std::string completedStr)
+{
+    std::istringstream ss(completedStr);
+    ss >> std::get_time(&_completed, dateformat);
+
+    _added.tm_mon += 1;
+    _added.tm_year += 1900;
+}
+
+PUBLIC void Libib::setAdded(std::string addedStr)
+{
+    std::istringstream ss(addedStr);
+    ss >> std::get_time(&_added, dateformat);
+
+    _added.tm_mon += 1;
+    _added.tm_year += 1900;
+}
+
 PUBLIC void Libib::setCopies(int copies) { _copies = copies; }
 
 PUBLIC std::string Libib::ItemType() const { return _itemType; }
@@ -94,9 +140,3 @@ PUBLIC tm Libib::Began() const { return _began; }
 PUBLIC tm Libib::Completed() const { return _completed; }
 PUBLIC tm Libib::Added() const { return _added; }
 PUBLIC int Libib::Copies() const { return _copies; }
-
-
-PUBLIC void Libib::normalize_tm()
-{
-
-}

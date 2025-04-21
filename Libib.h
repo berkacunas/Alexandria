@@ -5,6 +5,8 @@
 #include <ctime>
 
 class Libib {
+    const char *dateformat = "%Y-%m-%d";
+
     std::string _itemType;
     std::string _title;
     std::string _creators;
@@ -47,7 +49,7 @@ public:
     void setUPC_ISBN10(unsigned long long UPC_ISBN10);
     void setDescription(std::string description);
     void setPublisher(std::string publisher);
-    void setPublishDate(tm publishDate);
+    void setPublishDate(std::string publishDateStr);
     void setGroup(std::string group);
     void setTags(std::string tags);
     void setNotes(std::string notes);
@@ -61,11 +63,11 @@ public:
     void setESRB(std::string ESRB);
     void setRating(double rating);
     void setReview(std::string review);
-    void setReviewDate(tm reviewDate);
+    void setReviewDate(std::string reviewDateStr);
     void setStatus(std::string status);
-    void setBegan(tm began);
-    void setCompleted(tm completed);
-    void setAdded(tm added);
+    void setBegan(std::string began);
+    void setCompleted(std::string completed);
+    void setAdded(std::string added);
     void setCopies(int copies);
 
     std::string ItemType() const ;
@@ -97,8 +99,6 @@ public:
     tm Completed() const;
     tm Added() const;
     int Copies() const;
-
-    void normalize_tm();
  };
 
 #endif // LIBIB_H
