@@ -38,6 +38,18 @@ PUBLIC Libib::Libib()
     _copies = 0;
 }
 
+PUBLIC std::ostream &operator<<(std::ostream &os, Libib const &libib)
+{
+    os << libib.Title() << " " << libib.Creators() << std::endl;
+
+    return os;
+}
+
+PUBLIC std::string Libib::toStr()
+{
+    return this->Title() + " " + this->Creators();
+}
+
 PUBLIC void Libib::setItemType(std::string itemType) { _itemType = itemType; }
 PUBLIC void Libib::setTitle(std::string title) { _title = title; }
 PUBLIC void Libib::setCreators(std::string creators) { _creators = creators; }

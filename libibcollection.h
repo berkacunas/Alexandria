@@ -1,6 +1,8 @@
 #ifndef LIBIBCOLLECTION_H
 #define LIBIBCOLLECTION_H
 
+#define _CRT_SECURE_NO_WARNINGS
+
 #include <string>
 #include <vector>
 
@@ -19,6 +21,7 @@ public:
 
     Libib readLine(const std::vector<std::string> &line);
     void addItem(Libib libib);
+    int size();
 };
 
 #endif // LIBIBCOLLECTION_H

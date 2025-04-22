@@ -10,7 +10,9 @@
 #include <QKeyEvent>
 #include <QCloseEvent>
 
+#include "Libib.h"
 #include "libibparser.h"
+#include "libibcollection.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -26,6 +28,7 @@ class MainWindow : public QMainWindow
     QMessageBox _msgBox;
 
     LibibParser *_libibParser;
+    LibibCollection *libibCollection;
 
     void foo(); // Test Func
 
@@ -56,6 +59,8 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+
+    void *libib_parse_callback(std::vector<std::string> wordList);
 
     void keyPressEvent(QKeyEvent *event);
 

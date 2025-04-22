@@ -39,6 +39,9 @@ class Libib {
 
 public:
     explicit Libib();
+    friend std::ostream & operator<<(std::ostream & _stream, Libib const &libib);
+
+    std::string toStr();
 
     void setItemType(std::string itemType);
     void setTitle(std::string title);

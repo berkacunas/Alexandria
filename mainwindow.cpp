@@ -10,7 +10,7 @@
 #include "connection.h"
 #include "LibibCollection.h"
 
-void libib_parse_callback(std::vector<std::string> wordList);
+
 
 
 PUBLIC MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
@@ -94,15 +94,13 @@ PROTECTED void MainWindow::closeEvent(QCloseEvent *event)
     qDebug() << "QCloseEvent : Application closed";
 }
 
-CALLBACK void libib_parse_callback(std::vector<std::string> wordList)
+CALLBACK void (MainWindow::*libib_parse_callback)(std::vector<std::string> wordList)
 {
-    LibibCollection libibCollection;
-
-    Libib libib;
-
     try {
-        libib = libibCollection.readLine(wordList);
-        libibCollection.addItem(libib);
+        Libib libib = libibCollection->readLine(wordList);
+        qDebug() << libibCollection->size() << ". " << QString::fromStdString(libib.toStr());
+
+        libibCollection->addItem(libib);
     }
     catch (std::exception &r) {
         qDebug() << QString::fromStdString(std::string(r.what()).append(" " + libib.Title()));
@@ -155,16 +153,18 @@ PUBLIC_SLOT void MainWindow::importLibibCsv()
         return;
 
     _libibParser = new LibibParser(fileName.toStdString());
-    std::vector<std::vector<std::string>> wordLists = _libibParser->parse(',', libib_parse_callback);
+    std::vector<std::vector<std::string>> wordLists = _libibParser->parse(',', this->libib_parse_callback);
 
     LibibCollection libibs;
     for (int i = 0; i < wordLists.size(); ++i) {
         Libib libib = libibs.readLine(wordLists[i]);
         libibs.addItem(libib);
 
+        /*
         QSqlQuery query;
         query.prepare(QString("INSERT INTO Book(id, Name, Pages, PublisherId, LanguageId, ShopId, IsRead, LastReadDate, Price, PurchasedDay, AddDate)) ") +
                       QString("VALUES (:id, :Name, :Pages, :PublisherId, :LanguageId, :ShopId, :IsRead, :LastReadDate, :Price, :PurchasedDay, :AddDate)"));
+
 
         query.bindValue(":Name", QString::fromStdString(libib.Title()));
         query.bindValue(":Pages", 1);
@@ -179,6 +179,7 @@ PUBLIC_SLOT void MainWindow::importLibibCsv()
         query.bindValue(":AddDate", QString::fromStdString(std::to_string(libib.Added().tm_wday) + std::to_string(libib.Added().tm_mon) + std::to_string(libib.Added().tm_year)));
 
         query.exec();
+*/
     }
 
 

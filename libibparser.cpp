@@ -45,8 +45,10 @@ std::vector<std::vector<std::string>> LibibParser::parse(char delimeter, void (*
                     word += line[k];
             }
 
-            // if (callback != NULL)
-            //   callback(wordList);
+             wordList.push_back(word); // for last word.
+
+            if (callback != NULL)
+                callback(wordList);
 
             wordLists.push_back(wordList);
         }
