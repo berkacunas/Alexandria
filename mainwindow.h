@@ -60,8 +60,6 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-    void *libib_parse_callback(std::vector<std::string> wordList);
-
     void keyPressEvent(QKeyEvent *event);
 
 protected:

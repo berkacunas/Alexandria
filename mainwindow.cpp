@@ -8,9 +8,10 @@
 
 #include "globalvars.h"
 #include "connection.h"
-#include "LibibCollection.h"
+#include "libibcollection.h"
 
-
+void ParseCallback(std::vector<std::string> wordList);
+void LibibCallback(Libib libib);
 
 
 PUBLIC MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
@@ -94,13 +95,17 @@ PROTECTED void MainWindow::closeEvent(QCloseEvent *event)
     qDebug() << "QCloseEvent : Application closed";
 }
 
-CALLBACK void (MainWindow::*libib_parse_callback)(std::vector<std::string> wordList)
+CALLBACK void ParseCallback(std::vector<std::string> wordList)
 {
-    try {
-        Libib libib = libibCollection->readLine(wordList);
-        qDebug() << libibCollection->size() << ". " << QString::fromStdString(libib.toStr());
+    qDebug() << "WordList: " << wordList;
+}
 
-        libibCollection->addItem(libib);
+CALLBACK void LibibCallback(Libib libib)
+{
+    if (libib.Title() == "Pan")
+        ;
+    try {
+        qDebug() << QString::fromStdString(libib.toStr());
     }
     catch (std::exception &r) {
         qDebug() << QString::fromStdString(std::string(r.what()).append(" " + libib.Title()));
@@ -153,12 +158,13 @@ PUBLIC_SLOT void MainWindow::importLibibCsv()
         return;
 
     _libibParser = new LibibParser(fileName.toStdString());
-    std::vector<std::vector<std::string>> wordLists = _libibParser->parse(',', this->libib_parse_callback);
+    std::vector<std::vector<std::string>> wordLists = _libibParser->parse(',', ParseCallback);
 
     LibibCollection libibs;
     for (int i = 0; i < wordLists.size(); ++i) {
-        Libib libib = libibs.readLine(wordLists[i]);
-        libibs.addItem(libib);
+        Libib libib = _libibParser->readLine(wordLists[i], LibibCallback);
+        if (libib.ItemType() == "book")
+            libibs.addItem(libib);
 
         /*
         QSqlQuery query;
