@@ -10,6 +10,8 @@
 #include <QKeyEvent>
 #include <QCloseEvent>
 
+#include <QStandardItemModel>
+
 #include "Libib.h"
 #include "libibparser.h"
 #include "libibcollection.h"
@@ -31,6 +33,10 @@ class MainWindow : public QMainWindow
     LibibCollection *libibCollection;
 
     void foo(); // Test Func
+    void setHeadingList();
+
+
+    QStandardItemModel* createTestModel(QObject* parent);
 
     QAction *action_NewDatabase;
     QAction *action_OpenDatabase;

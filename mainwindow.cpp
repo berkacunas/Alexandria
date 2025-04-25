@@ -1,6 +1,8 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 
+#include <QTableView>
+#include <QHeaderView>
 #include <QFileDialog>
 
 #include <filesystem>
@@ -38,7 +40,6 @@ PUBLIC MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui:
     action_importLibib->setStatusTip(tr("Import Libib Csv"));
     connect(action_importLibib, &QAction::triggered, this, &MainWindow::importLibibCsv);
 
-
     menuBar = QMainWindow::menuBar();
 
     fileMenu = menuBar->addMenu(tr("&File"));
@@ -67,6 +68,9 @@ PUBLIC MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui:
     addDockWidget(Qt::LeftDockWidgetArea, contentsWindow);
 
     headingList = new QListWidget(contentsWindow);
+
+    this->setHeadingList();
+
     contentsWindow->setWidget(headingList);
 
     setCorner(Qt::TopLeftCorner, Qt::LeftDockWidgetArea);
@@ -77,15 +81,25 @@ PUBLIC MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui:
     QWidget *centralWidget = new QWidget(this);
     setCentralWidget(centralWidget);
 
+    QVBoxLayout *vMainlayout = new QVBoxLayout(centralWidget);
+    QTableView *tableView = new QTableView();
+    tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
+    tableView->setSelectionMode(QAbstractItemView::SingleSelection);
+    tableView->setGridStyle(Qt::SolidLine);
+    tableView->setShowGrid(true);
+    tableView->setModel(this->createTestModel(tableView));
+
+    vMainlayout->addWidget(tableView);
+
     foo();  // for test purposes.
 }
 
 PUBLIC void MainWindow::keyPressEvent(QKeyEvent *event)
 {
     qDebug() << "MyLineEdit : keyPressEvent , key : " << event->text();
-
     qDebug() << " ChildLineEdit,keyPressEvent , key : " << event->text();
     qDebug() << "Event accepted : " << event->isAccepted();
+
     event->ignore();
 }
 
@@ -102,8 +116,6 @@ CALLBACK void ParseCallback(std::vector<std::string> wordList)
 
 CALLBACK void LibibCallback(Libib libib)
 {
-    if (libib.Title() == "Pan")
-        ;
     try {
         qDebug() << QString::fromStdString(libib.toStr());
     }
@@ -213,8 +225,39 @@ PRIVATE std::string MainWindow::getRegisteredQSqlDrivers()
         if (i < length - 1)
             ss << " ";
     }
-
     return ss.str();
+}
+
+PRIVATE void MainWindow::setHeadingList()
+{
+    QMap<QString, QIcon> headingListMap;
+    headingListMap.insert("Merhaba", QIcon("://Resources/Images/book.png"));
+
+    QMapIterator<QString, QIcon> iterHeadingMap(headingListMap);
+    while (iterHeadingMap.hasNext()) {
+        iterHeadingMap.next();
+        QListWidgetItem *item = new QListWidgetItem(iterHeadingMap.value(), iterHeadingMap.key());
+        headingList->addItem(item);
+    }
+}
+
+PRIVATE QStandardItemModel *MainWindow::createTestModel(QObject* parent)
+{
+    const int numRows = 10;
+    const int numColumns = 10;
+
+    QStandardItemModel* model = new QStandardItemModel(numRows, numColumns);
+    for (int row = 0; row < numRows; ++row)
+    {
+        for (int column = 0; column < numColumns; ++column)
+        {
+            QString text = QString('A' + QString::number(row) + QString::number(column + 1));
+            QStandardItem* item = new QStandardItem(text);
+            model->setItem(row, column, item);
+        }
+    }
+
+    return model;
 }
 
 PRIVATE void MainWindow::foo()

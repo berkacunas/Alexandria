@@ -29,12 +29,10 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         application.qrc
         connection.h
         globalvars.h
-        Libib.h
         datetimechrono.h
+        Libib.h libib.cpp
         libibparser.h libibparser.cpp
         libibcollection.h libibcollection.cpp
-        libib.cpp
-
 
     )
 # Define target properties for Android with Qt 6 as:
