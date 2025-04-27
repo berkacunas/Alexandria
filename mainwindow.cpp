@@ -68,7 +68,7 @@ PUBLIC MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui:
     addDockWidget(Qt::LeftDockWidgetArea, contentsWindow);
 
     headingList = new QListWidget(contentsWindow);
-
+    headingList->viewport()->installEventFilter(this);
     this->setHeadingList();
 
     contentsWindow->setWidget(headingList);
@@ -93,6 +93,17 @@ PUBLIC MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui:
 
     foo();  // for test purposes.
 }
+
+/*
+void MainWindow::mousePressEvent(QMouseEvent *e)
+{
+    if(e->button()==Qt::RightButton)
+        emit btnRightClicked();
+
+    //this forwards the event to the QPushButton
+    QPushButton::mousePressEvent(e);
+}
+*/
 
 PUBLIC void MainWindow::keyPressEvent(QKeyEvent *event)
 {
@@ -199,8 +210,31 @@ PUBLIC_SLOT void MainWindow::importLibibCsv()
         query.exec();
 */
     }
+}
 
 
+PROTECTED bool MainWindow::eventFilter(QObject *target, QEvent *event)
+{
+    if(target == headingList->viewport())
+    {
+        if(event->type() == QEvent::MouseButtonPress) {
+            QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
+            QPoint pos = mouseEvent->pos();
+            QListWidgetItem *item = headingList->itemAt(pos);
+            if(item)
+                qDebug() << "List Widget Item Clicked: " << item->text();
+
+            this->openRecord(target);
+            event->ignore();
+            return true;
+        }
+    }
+    return QWidget::eventFilter(target, event);
+}
+
+PRIVATE void MainWindow::openRecord(QObject *sender)
+{
+    qDebug() << typeid(sender).name();
 }
 
 PRIVATE int MainWindow::showMessageBox(QMessageBox::Icon icon, const QString &title, const QString &text, QMessageBox::StandardButtons buttons, QMessageBox::StandardButton defaultButton)

@@ -42,6 +42,7 @@ class MainWindow : public QMainWindow
     QAction *action_OpenDatabase;
     QAction *action_DisplayDatabaseDrivers;
     QAction *action_importLibib;
+    QAction *action_openRecord;
 
     QMenuBar *menuBar;
     QMenu *fileMenu;
@@ -61,6 +62,7 @@ class MainWindow : public QMainWindow
                        QMessageBox::StandardButton defaultButton = QMessageBox::Ok);
 
     std::string getRegisteredQSqlDrivers();
+    void openRecord(QObject *sender);
 
 public:
     MainWindow(QWidget *parent = nullptr);
@@ -70,12 +72,14 @@ public:
 
 protected:
     void closeEvent(QCloseEvent *event);
+    bool eventFilter(QObject *target, QEvent *event);
 
 public slots:
     void newDatabase();
     void openDatabase();
     void displayDatabaseDrivers();
     void importLibibCsv();
+
 
 };
 
