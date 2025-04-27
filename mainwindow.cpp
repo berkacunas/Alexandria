@@ -215,8 +215,7 @@ PUBLIC_SLOT void MainWindow::importLibibCsv()
 
 PROTECTED bool MainWindow::eventFilter(QObject *target, QEvent *event)
 {
-    if(target == headingList->viewport())
-    {
+    if(target == headingList->viewport()) {
         if(event->type() == QEvent::MouseButtonPress) {
             QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
             QPoint pos = mouseEvent->pos();
@@ -281,10 +280,8 @@ PRIVATE QStandardItemModel *MainWindow::createTestModel(QObject* parent)
     const int numColumns = 10;
 
     QStandardItemModel* model = new QStandardItemModel(numRows, numColumns);
-    for (int row = 0; row < numRows; ++row)
-    {
-        for (int column = 0; column < numColumns; ++column)
-        {
+    for (int row = 0; row < numRows; ++row) {
+        for (int column = 0; column < numColumns; ++column) {
             QString text = QString('A' + QString::number(row) + QString::number(column + 1));
             QStandardItem* item = new QStandardItem(text);
             model->setItem(row, column, item);
