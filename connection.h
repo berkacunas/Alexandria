@@ -82,6 +82,7 @@ static bool createTable(const std::string &dbname, const std::string &tableName,
         return false;
 
     std::ostringstream oss;
+    bool hasId = false;
 
     if (dropTableIfExists)
         oss << "CREATE TABLE ";
@@ -90,11 +91,29 @@ static bool createTable(const std::string &dbname, const std::string &tableName,
     oss << tableName << "(";
 
     for (int i = 0; i < columns.size(); ++i) {
-        if (i == columns.size() - 1) {
-            oss << columns[i]  << ");";
-            break;
+
+        oss << "\"" << columns[i] << "\"";
+
+        std::string subStr = columns[i].substr(columns[i].size() - 2, 2);
+
+        if (columns[i] == "id") {
+            hasId = true;
+            oss << " INTEGER NOT NULL UNIQUE";
         }
-        oss << columns[i] << ", ";
+        else if (columns[i].substr(columns[i].size() - 2, 2) == "Id") // Are last 2 chars "Id" ?
+            oss << " INTEGER";
+        else if (columns[i].find("Date") != std::string::npos) // is string contain "Date" as a substring ?
+            oss << " REAL";
+        else
+            oss << " TEXT";
+
+        if (i == columns.size() - 1) {
+            if (hasId)
+                oss << ", PRIMARY KEY(\"id\" AUTOINCREMENT)";
+            oss << ");";
+        }
+        else
+            oss << ", ";
     }
 
     QSqlQuery query;

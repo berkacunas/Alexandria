@@ -17,15 +17,17 @@ PUBLIC_SETTER void TsvParser::setTsvFile(std::string tsvFile)
     _tsvFile = tsvFile;
 }
 
-PUBLIC_GETTER std::string TsvParser::TsvFile()
+PUBLIC_GETTER std::string TsvParser::tsvFile()
 {
     return _tsvFile;
 }
 
 PUBLIC_SETTER void TsvParser::setDbFile(std::string dbFile)
 {
-    if (!std::filesystem::is_regular_file(dbFile))
+    if (!std::filesystem::is_regular_file(dbFile)) {
         throw std::exception("TsvParser::dbFile is not a regular file") ;
+        return;
+    }
 
     _dbFile = dbFile;
 }
@@ -35,7 +37,12 @@ PUBLIC_GETTER std::string TsvParser::dbFile()
     return _dbFile;
 }
 
-PUBLIC std::vector<std::vector<std::string>> TsvParser::parse(char delimeter, void (*ParseCallback)(std::vector<std::string>))
+PUBLIC_GETTER std::string TsvParser::tableName()
+{
+    return _tableName;
+}
+
+PUBLIC std::vector<std::vector<std::string>> TsvParser::parse(char delimeter, bool dropTableIfExists, void (*ParseCallback)(std::vector<std::string>))
 {
     std::vector<std::vector<std::string>> wordLists;
     std::ifstream ifs(_tsvFile);
@@ -56,8 +63,9 @@ PUBLIC std::vector<std::vector<std::string>> TsvParser::parse(char delimeter, vo
             wordLists.push_back(wordList);
 
             if (i == 0) { // Create table.
-                std::string tableName = std::filesystem::path(_tsvFile).stem().string();
-                if (!createTable(_dbFile, tableName, wordList))
+                _tableName = std::filesystem::path(_tsvFile).stem().string();
+                copy(wordList.begin(), wordList.end(), back_inserter(_columns));
+                if (!createTable(_dbFile, _tableName, _columns, dropTableIfExists))
                     throw std::exception(("Cannot create table " + _tsvFile).c_str());
                 continue;
             }

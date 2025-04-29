@@ -10,6 +10,8 @@ class TsvParser {
 
     std::string _dbFile;
     std::string _tsvFile;
+    std::string _tableName;
+    std::vector<std::string> _columns;
 
     std::vector<std::string> getWordList(std::string, char del);
 
@@ -18,10 +20,13 @@ public:
 
     void setDbFile(std::string);
     void setTsvFile(std::string);
-    std::string dbFile();
-    std::string TsvFile();
 
-    std::vector<std::vector<std::string>> parse(char delimeter = '|', void (*ParseCallback)(std::vector<std::string>) = nullptr);
+    std::string dbFile();
+    std::string tsvFile();
+    std::string tableName();
+    std::vector<std::string> columns();
+
+    std::vector<std::vector<std::string>> parse(char delimeter = '|', bool dropTableIfExists = false, void (*ParseCallback)(std::vector<std::string>) = nullptr);
     Libib readLine(const std::vector<std::string> &line, void (*LibibCallback)(Libib) = nullptr);
 };
 

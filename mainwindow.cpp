@@ -97,6 +97,8 @@ PUBLIC MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui:
 
     vMainlayout->addWidget(tableView);
 
+    this->statusBar()->showMessage(tr("Ready"));
+
     foo();  // for test purposes.
 }
 
@@ -162,7 +164,9 @@ PUBLIC_SLOT void MainWindow::newDatabase()
 
     if (!std::filesystem::is_regular_file(fileName.toStdString())) {
         int count = createDatabase(fileName);
-        this->showMessageBox(QMessageBox::Information, "Database Created", QString::fromStdString((std::to_string(count))) + " tables created.", QMessageBox::Ok);
+
+        std::string msg = "Database " + std::filesystem::path(fileName.toStdString()).stem().string() + " with " + std::to_string(count) + " tables created.";
+        this->statusBar()->showMessage(tr(msg.c_str()));
     }
 
     if (!createConnection(fileName))
@@ -235,18 +239,34 @@ PUBLIC_SLOT void MainWindow::importTsv()
 
     _tsvParser = new TsvParser();
     _tsvParser->setTsvFile(fileName.toStdString());
-    _tsvParser->setDbFile("C:\\berk\\Documents\\Databases\\Alexandria\\SQLite\\Alexandria.db");
+
+    try {
+        _tsvParser->setDbFile("C:\\berk\\Documents\\Databases\\Alexandria\\SQLite\\Alexandria_firstcreatedmanually.db");
+    }
+    catch (std::exception &r) {
+        this->showMessageBox(QMessageBox::Critical, "Database not found !", r.what(), QMessageBox::Ok, QMessageBox::Ok);
+        return;
+    }
 
     std::vector<std::vector<std::string>> wordLists;
 
     try {
-        wordLists = _tsvParser->parse('|', ParseCallback);
+        wordLists = _tsvParser->parse('|', false, ParseCallback);
     }
     catch (std::exception &r) {
         this->showMessageBox(QMessageBox::Critical, "Error", r.what(), QMessageBox::Ok, QMessageBox::Ok);
+        return;
     }
 
     qDebug() << wordLists.size();
+
+    QSqlQuery query;
+
+
+    // insert data ...
+    // use _tsvParser.tableName() + _tsvParser.columns to build query string inside an istringstream
+    // in a loop which turns one less than equal the size of wordLists.size().
+
         /*
         QSqlQuery query;
         query.prepare(QString("INSERT INTO Book(id, Name, Pages, PublisherId, LanguageId, ShopId, IsRead, LastReadDate, Price, PurchasedDay, AddDate)) ") +
