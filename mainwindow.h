@@ -62,15 +62,14 @@ class MainWindow : public QMainWindow
                        QMessageBox::StandardButton defaultButton = QMessageBox::Ok);
 
     std::string getRegisteredQSqlDrivers();
-    void openRecord(QObject *sender);
 
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-    void keyPressEvent(QKeyEvent *event);
-
 protected:
+
+    void keyPressEvent(QKeyEvent *event);
     void closeEvent(QCloseEvent *event);
     bool eventFilter(QObject *target, QEvent *event);
 
@@ -79,8 +78,7 @@ public slots:
     void openDatabase();
     void displayDatabaseDrivers();
     void importLibibCsv();
-
-
+    void openRecord(QListWidgetItem *item);
 };
 
 #endif // MAINWINDOW_H

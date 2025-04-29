@@ -68,7 +68,8 @@ PUBLIC MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui:
     addDockWidget(Qt::LeftDockWidgetArea, contentsWindow);
 
     headingList = new QListWidget(contentsWindow);
-    headingList->viewport()->installEventFilter(this);
+    connect(headingList, &QListWidget::itemClicked, this, &MainWindow::openRecord);
+    //headingList->viewport()->installEventFilter(this);
     this->setHeadingList();
 
     contentsWindow->setWidget(headingList);
@@ -94,18 +95,7 @@ PUBLIC MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui:
     foo();  // for test purposes.
 }
 
-/*
-void MainWindow::mousePressEvent(QMouseEvent *e)
-{
-    if(e->button()==Qt::RightButton)
-        emit btnRightClicked();
-
-    //this forwards the event to the QPushButton
-    QPushButton::mousePressEvent(e);
-}
-*/
-
-PUBLIC void MainWindow::keyPressEvent(QKeyEvent *event)
+PROTECTED void MainWindow::keyPressEvent(QKeyEvent *event)
 {
     qDebug() << "MyLineEdit : keyPressEvent , key : " << event->text();
     qDebug() << " ChildLineEdit,keyPressEvent , key : " << event->text();
@@ -118,6 +108,26 @@ PROTECTED void MainWindow::closeEvent(QCloseEvent *event)
 {
     event->accept();
     qDebug() << "QCloseEvent : Application closed";
+}
+
+PROTECTED bool MainWindow::eventFilter(QObject *target, QEvent *event)
+{
+    /*
+    if(target == headingList->viewport()) {
+        if(event->type() == QEvent::MouseButtonPress) {
+            QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
+            QPoint pos = mouseEvent->pos();
+            QListWidgetItem *item = headingList->itemAt(pos);
+            if(item)
+                qDebug() << "List Widget Item Clicked: " << item->text();
+
+            this->openRecord(target);
+            event->ignore();
+            return true;
+        }
+    }
+    */
+    return QWidget::eventFilter(target, event);
 }
 
 CALLBACK void ParseCallback(std::vector<std::string> wordList)
@@ -212,28 +222,9 @@ PUBLIC_SLOT void MainWindow::importLibibCsv()
     }
 }
 
-
-PROTECTED bool MainWindow::eventFilter(QObject *target, QEvent *event)
+PRIVATE void MainWindow::openRecord(QListWidgetItem *item)
 {
-    if(target == headingList->viewport()) {
-        if(event->type() == QEvent::MouseButtonPress) {
-            QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
-            QPoint pos = mouseEvent->pos();
-            QListWidgetItem *item = headingList->itemAt(pos);
-            if(item)
-                qDebug() << "List Widget Item Clicked: " << item->text();
-
-            this->openRecord(target);
-            event->ignore();
-            return true;
-        }
-    }
-    return QWidget::eventFilter(target, event);
-}
-
-PRIVATE void MainWindow::openRecord(QObject *sender)
-{
-    qDebug() << typeid(sender).name();
+    qDebug() << item->text();
 }
 
 PRIVATE int MainWindow::showMessageBox(QMessageBox::Icon icon, const QString &title, const QString &text, QMessageBox::StandardButtons buttons, QMessageBox::StandardButton defaultButton)
@@ -279,7 +270,7 @@ PRIVATE QStandardItemModel *MainWindow::createTestModel(QObject* parent)
     const int numRows = 10;
     const int numColumns = 10;
 
-    QStandardItemModel* model = new QStandardItemModel(numRows, numColumns);
+    QStandardItemModel *model = new QStandardItemModel(numRows, numColumns);
     for (int row = 0; row < numRows; ++row) {
         for (int column = 0; column < numColumns; ++column) {
             QString text = QString('A' + QString::number(row) + QString::number(column + 1));
