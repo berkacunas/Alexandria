@@ -40,6 +40,10 @@ PUBLIC MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui:
     action_importLibib->setStatusTip(tr("Import Libib Csv"));
     connect(action_importLibib, &QAction::triggered, this, &MainWindow::importLibibCsv);
 
+    action_importTsv = new QAction(QIcon(), tr("Import Tsv"), this);
+    action_importTsv->setStatusTip(tr("Import Tsv"));
+    connect(action_importTsv, &QAction::triggered, this, &MainWindow::importTsv);
+
     menuBar = QMainWindow::menuBar();
 
     fileMenu = menuBar->addMenu(tr("&File"));
@@ -48,6 +52,7 @@ PUBLIC MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui:
     fileMenu->addAction(action_DisplayDatabaseDrivers);
     fileMenu->addSeparator();
     fileMenu->addAction(action_importLibib);
+    fileMenu->addAction(action_importTsv);
 
     editMenu = menuBar->addMenu(tr("&Edit"));
     viewMenu = menuBar->addMenu(tr("&View"));
@@ -221,6 +226,51 @@ PUBLIC_SLOT void MainWindow::importLibibCsv()
 */
     }
 }
+
+PUBLIC_SLOT void MainWindow::importTsv()
+{
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), "C:\\berk\\Documents\\Databases\\Alexandria\\tsv", tr("TSV file (*.tsv)"));
+    if (fileName.isEmpty())
+        return;
+
+    _tsvParser = new TsvParser();
+    _tsvParser->setTsvFile(fileName.toStdString());
+    _tsvParser->setDbFile("C:\\berk\\Documents\\Databases\\Alexandria\\SQLite\\Alexandria.db");
+
+    std::vector<std::vector<std::string>> wordLists;
+
+    try {
+        wordLists = _tsvParser->parse('|', ParseCallback);
+    }
+    catch (std::exception &r) {
+        this->showMessageBox(QMessageBox::Critical, "Error", r.what(), QMessageBox::Ok, QMessageBox::Ok);
+    }
+
+    qDebug() << wordLists.size();
+        /*
+        QSqlQuery query;
+        query.prepare(QString("INSERT INTO Book(id, Name, Pages, PublisherId, LanguageId, ShopId, IsRead, LastReadDate, Price, PurchasedDay, AddDate)) ") +
+                      QString("VALUES (:id, :Name, :Pages, :PublisherId, :LanguageId, :ShopId, :IsRead, :LastReadDate, :Price, :PurchasedDay, :AddDate)"));
+
+
+        query.bindValue(":Name", QString::fromStdString(libib.Title()));
+        query.bindValue(":Pages", 1);
+
+        query.bindValue(":PublisherId", 1);
+        query.bindValue(":LanguageId", 1);
+        query.bindValue(":ShopId", 1);
+        query.bindValue(":IsRead", false);
+        query.bindValue(":LastReadDate", QString::fromStdString(std::to_string(libib.Completed().tm_wday) + std::to_string(libib.Completed().tm_mon) + std::to_string(libib.Completed().tm_year)));
+        query.bindValue(":Price", libib.Price());
+        query.bindValue(":PurchasedDay", QString::fromStdString(std::to_string(libib.PublishDate().tm_wday) + std::to_string(libib.PublishDate().tm_mon) + std::to_string(libib.PublishDate().tm_year)));
+        query.bindValue(":AddDate", QString::fromStdString(std::to_string(libib.Added().tm_wday) + std::to_string(libib.Added().tm_mon) + std::to_string(libib.Added().tm_year)));
+
+        query.exec();
+*/
+}
+
+
+
 
 PRIVATE void MainWindow::openRecord(QListWidgetItem *item)
 {

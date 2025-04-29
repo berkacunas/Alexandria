@@ -10,10 +10,13 @@
 #include <QFile>
 #include <QStandardPaths>
 
+#include <sstream>
+
 static int createDatabase(const QString &dbname);
 static bool createConnection(const QString &filename);
 static QStringList QSqlDatabaseDrivers();
-static int execSqlScriptFile(QSqlDatabase &db, const QString &filename);
+static int execSqlFromScriptFile(QSqlDatabase &db, const QString &filename);
+static bool createTable(const std::string &dbname, const std::string &tableName, const std::vector<std::string> &columns, bool dropTableIfExists = false);
 
 const QString genericDataLocation = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation); //AppDataLocation
 const QString dbPath = genericDataLocation + "/Alexandria/";
@@ -28,7 +31,7 @@ static int createDatabase(const QString &dbname)
     if (!db.isOpen())
         return 0;
 
-    return execSqlScriptFile(db, createTableScript);
+    return execSqlFromScriptFile(db, createTableScript);
 }
 
 static bool createConnection(const QString &filename)
@@ -44,7 +47,7 @@ static QStringList QSqlDatabaseDrivers()
     return QSqlDatabase::drivers();
 }
 
-static int execSqlScriptFile(QSqlDatabase &db, const QString &filename)
+static int execSqlFromScriptFile(QSqlDatabase &db, const QString &filename)
 {
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
@@ -69,3 +72,34 @@ static int execSqlScriptFile(QSqlDatabase &db, const QString &filename)
 }
 
 #endif // CONNECTION_H
+
+static bool createTable(const std::string &dbname, const std::string &tableName, const std::vector<std::string> &columns, bool dropTableIfExists)
+{
+    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+    db.setDatabaseName(QString::fromStdString(dbname));
+    db.open();
+    if (!db.isOpen())
+        return false;
+
+    std::ostringstream oss;
+
+    if (dropTableIfExists)
+        oss << "CREATE TABLE ";
+    else
+        oss << "CREATE TABLE IF NOT EXISTS ";
+    oss << tableName << "(";
+
+    for (int i = 0; i < columns.size(); ++i) {
+        if (i == columns.size() - 1) {
+            oss << columns[i]  << ");";
+            break;
+        }
+        oss << columns[i] << ", ";
+    }
+
+    QSqlQuery query;
+    std::string queryString = oss.str();
+
+    return query.exec(QString::fromStdString(queryString));
+}
+

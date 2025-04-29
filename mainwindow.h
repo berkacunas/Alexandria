@@ -16,6 +16,8 @@
 #include "libibparser.h"
 #include "libibcollection.h"
 
+#include "tsvparser.h"
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -32,6 +34,8 @@ class MainWindow : public QMainWindow
     LibibParser *_libibParser;
     LibibCollection *libibCollection;
 
+    TsvParser *_tsvParser;
+
     void foo(); // Test Func
     void setHeadingList();
 
@@ -42,6 +46,7 @@ class MainWindow : public QMainWindow
     QAction *action_OpenDatabase;
     QAction *action_DisplayDatabaseDrivers;
     QAction *action_importLibib;
+    QAction *action_importTsv;
     QAction *action_openRecord;
 
     QMenuBar *menuBar;
@@ -78,6 +83,7 @@ public slots:
     void openDatabase();
     void displayDatabaseDrivers();
     void importLibibCsv();
+    void importTsv();
     void openRecord(QListWidgetItem *item);
 };
 

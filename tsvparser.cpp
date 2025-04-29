@@ -1,63 +1,69 @@
-#include "libibparser.h"
+#include "tsvparser.h"
 
+#include <iostream>
 #include <fstream>
-#include <sstream>
+#include <filesystem>
 
-LibibParser::LibibParser(std::string csvFile)
+#include "connection.h"
+#include "globalvars.h"
+
+TsvParser::TsvParser()
 {
-    _csvFile = csvFile;
+
 }
 
-PUBLIC_SETTER void LibibParser::setCsvFile(std::string csvFile)
+PUBLIC_SETTER void TsvParser::setTsvFile(std::string tsvFile)
 {
-    _csvFile = csvFile;
+    _tsvFile = tsvFile;
 }
 
-PUBLIC_GETTER std::string LibibParser::CsvFile()
+PUBLIC_GETTER std::string TsvParser::TsvFile()
 {
-    return _csvFile;
+    return _tsvFile;
 }
 
-PUBLIC std::vector<std::vector<std::string>> LibibParser::parse(char delimeter, void (*ParseCallback)(std::vector<std::string>))
+PUBLIC_SETTER void TsvParser::setDbFile(std::string dbFile)
+{
+    if (!std::filesystem::is_regular_file(dbFile))
+        throw std::exception("TsvParser::dbFile is not a regular file") ;
+
+    _dbFile = dbFile;
+}
+
+PUBLIC_GETTER std::string TsvParser::dbFile()
+{
+    return _dbFile;
+}
+
+PUBLIC std::vector<std::vector<std::string>> TsvParser::parse(char delimeter, void (*ParseCallback)(std::vector<std::string>))
 {
     std::vector<std::vector<std::string>> wordLists;
-    std::ifstream ifs;
+    std::ifstream ifs(_tsvFile);
     std::string line;
+    std::vector<std::string> wordList;
+    char del = delimeter;
 
     try {
-        ifs.open(_csvFile);
+        if (!ifs.is_open()) {
+            std::string msg = "Cannot open " + _tsvFile + " in TsvParser::parse()";
+            throw std::exception(msg.c_str());
+        }
 
-        for (int i = 0; getline(ifs, line); ++i) {
-            if (i == 0)
+        std::cout << "File " << _tsvFile << " opened.";
+
+        for (int i = 0; getline(ifs, line) && line.c_str()[0] != '\0'; ++i) {
+            wordList = this->getWordList(line, del);
+            wordLists.push_back(wordList);
+
+            if (i == 0) { // Create table.
+                std::string tableName = std::filesystem::path(_tsvFile).stem().string();
+                if (!createTable(_dbFile, tableName, wordList))
+                    throw std::exception(("Cannot create table " + _tsvFile).c_str());
                 continue;
-
-            bool inQuotes = false;
-
-            std::stringstream ss(line);
-            std::string word;
-            char del = delimeter;
-
-            std::vector<std::string> wordList;
-            // while (getline(ss, word, del))
-            //    wordList.push_back(word);
-
-            for (int k = 0; k < line.size(); ++k) {
-                if (!inQuotes && line[k] == del) {
-                    wordList.push_back(word);
-                    word.clear();
-                }
-                else if (line[k] == '"')
-                    inQuotes = !inQuotes;
-                else
-                    word += line[k];
             }
-
-             wordList.push_back(word); // for last word.
 
             if (ParseCallback != NULL)
                 ParseCallback(wordList);
-
-            wordLists.push_back(wordList);
         }
 
         ifs.close();
@@ -69,7 +75,29 @@ PUBLIC std::vector<std::vector<std::string>> LibibParser::parse(char delimeter, 
     return wordLists;
 }
 
-PUBLIC Libib LibibParser::readLine(const std::vector<std::string> &line, void (*LibibCallback)(Libib))
+PRIVATE std::vector<std::string> TsvParser::getWordList(std::string line, char del)
+{
+    std::vector<std::string> wordList;
+    std::string word;
+    bool inQuotes = false;
+
+    for (int k = 0; k < line.size(); ++k) {
+        if (!inQuotes && line[k] == del) {
+            wordList.push_back(word);
+            word.clear();
+        }
+        else if (line[k] == '"')
+            inQuotes = !inQuotes;
+        else
+            word += line[k];
+    }
+
+    wordList.push_back(word); // for last word.
+
+    return wordList;
+}
+
+PUBLIC Libib TsvParser::readLine(const std::vector<std::string> &line, void (*LibibCallback)(Libib))
 {
     Libib libib;
     const std::string dateStrFormat = "%Y-%m-%d";
@@ -93,7 +121,7 @@ PUBLIC Libib LibibParser::readLine(const std::vector<std::string> &line, void (*
                 libib.setEAN_ISBN13(std::stoull(line[5], nullptr, 0));
         }
         catch (std::exception &r) {
-            std::string msg = "Cannot convert to EAN_ISBN13 in LibibParser::readLine() ";
+            std::string msg = "Cannot convert to EAN_ISBN13 in TsvParser::readLine() ";
             msg.append(r.what());
             throw std::exception(msg.c_str());
         }
@@ -105,7 +133,7 @@ PUBLIC Libib LibibParser::readLine(const std::vector<std::string> &line, void (*
                 libib.setUPC_ISBN10(std::stoull(line[6], nullptr, 0));
         }
         catch (std::exception &r) {
-            std::string msg = "Cannot convert to UPC_ISBN10 in LibibParser::readLine() ";
+            std::string msg = "Cannot convert to UPC_ISBN10 in TsvParser::readLine() ";
             msg.append(r.what());
             throw std::exception(msg.c_str());
         }
@@ -131,7 +159,7 @@ PUBLIC Libib LibibParser::readLine(const std::vector<std::string> &line, void (*
                 libib.setPrice(std::stod(line[13], nullptr));
         }
         catch (std::exception &r) {
-            std::string msg = "Cannot convert to Price in LibibParser::readLine() ";
+            std::string msg = "Cannot convert to Price in TsvParser::readLine() ";
             msg.append(r.what());
             throw std::exception(msg.c_str());
         }
@@ -161,7 +189,7 @@ PUBLIC Libib LibibParser::readLine(const std::vector<std::string> &line, void (*
                 libib.setRating(std::stod(line[21], nullptr));
         }
         catch (std::exception &r) {
-            std::string msg = "Cannot convert to Rating in LibibParser::readLine() ";
+            std::string msg = "Cannot convert to Rating in TsvParser::readLine() ";
             msg.append(r.what());
             throw std::exception(msg.c_str());
         }
@@ -186,9 +214,4 @@ PUBLIC Libib LibibParser::readLine(const std::vector<std::string> &line, void (*
         LibibCallback(libib);
 
     return libib;
-}
-
-LibibParser::~LibibParser()
-{
-
 }
