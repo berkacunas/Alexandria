@@ -13,7 +13,7 @@
 #include <sstream>
 
 static int createDatabase(const QString &dbname);
-static bool createConnection(const QString &filename);
+static QSqlDatabase createConnection(const QString &filename);
 static QStringList QSqlDatabaseDrivers();
 static int execSqlFromScriptFile(QSqlDatabase &db, const QString &filename);
 static bool createTable(const std::string &dbname, const std::string &tableName, const std::vector<std::string> &columns, bool dropTableIfExists = false);
@@ -34,12 +34,14 @@ static int createDatabase(const QString &dbname)
     return execSqlFromScriptFile(db, createTableScript);
 }
 
-static bool createConnection(const QString &filename)
+static QSqlDatabase createConnection(const QString &filename)
 {
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName(filename);
+    if (db.open())
+        return db;
 
-    return db.open();
+    throw std::exception("createConnection() failed.");
 }
 
 static QStringList QSqlDatabaseDrivers()

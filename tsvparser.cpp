@@ -42,6 +42,11 @@ PUBLIC_GETTER std::string TsvParser::tableName()
     return _tableName;
 }
 
+PUBLIC_GETTER std::vector<std::string> TsvParser::columns()
+{
+    return _columns;
+}
+
 PUBLIC std::vector<std::vector<std::string>> TsvParser::parse(char delimeter, bool dropTableIfExists, void (*ParseCallback)(std::vector<std::string>))
 {
     std::vector<std::vector<std::string>> wordLists;
@@ -65,8 +70,8 @@ PUBLIC std::vector<std::vector<std::string>> TsvParser::parse(char delimeter, bo
             if (i == 0) { // Create table.
                 _tableName = std::filesystem::path(_tsvFile).stem().string();
                 copy(wordList.begin(), wordList.end(), back_inserter(_columns));
-                if (!createTable(_dbFile, _tableName, _columns, dropTableIfExists))
-                    throw std::exception(("Cannot create table " + _tsvFile).c_str());
+                if (!createTable(_dbFile, _tableName, _columns, dropTableIfExists)) ;
+                    // throw std::exception(("Cannot create table " + _tsvFile).c_str());
                 continue;
             }
 

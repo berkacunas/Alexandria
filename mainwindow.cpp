@@ -169,8 +169,13 @@ PUBLIC_SLOT void MainWindow::newDatabase()
         this->statusBar()->showMessage(tr(msg.c_str()));
     }
 
-    if (!createConnection(fileName))
-        this->showMessageBox(QMessageBox::Critical, "Error", "Cannot connect to SQLite !", QMessageBox::Ok, QMessageBox::Ok);
+    try {
+        createConnection(fileName);
+    }
+    catch (std::exception &r) {
+        this->showMessageBox(QMessageBox::Critical, "Error", r.what(), QMessageBox::Ok, QMessageBox::Ok);
+        return;
+    }
 }
 
 PUBLIC_SLOT void MainWindow::openDatabase()
@@ -179,8 +184,11 @@ PUBLIC_SLOT void MainWindow::openDatabase()
     if (fileName.isEmpty())
         return;
 
-    if (!createConnection(fileName)) {
-        this->showMessageBox(QMessageBox::Critical, "Error", "Cannot connect to SQLite !", QMessageBox::Ok, QMessageBox::Ok);
+    try {
+        createConnection(fileName);
+    }
+    catch (std::exception &r) {
+        this->showMessageBox(QMessageBox::Critical, "Error", r.what(), QMessageBox::Ok, QMessageBox::Ok);
         return;
     }
 
@@ -260,33 +268,61 @@ PUBLIC_SLOT void MainWindow::importTsv()
 
     qDebug() << wordLists.size();
 
-    QSqlQuery query;
+    std::ostringstream ossHeader;
+    std::ostringstream ossValues;
+    ossHeader << "INSERT INTO " << _tsvParser->tableName() << "(";
+    ossValues << "VALUES(";
 
+    std::vector<std::string> columns = _tsvParser->columns();
 
-    // insert data ...
-    // use _tsvParser.tableName() + _tsvParser.columns to build query string inside an istringstream
-    // in a loop which turns one less than equal the size of wordLists.size().
+    for (int i = 0; i < columns.size(); ++i) {
+        ossHeader << columns[i];
+        ossValues << ":" << columns[i];
+        if (i == columns.size() - 1) {
+            ossHeader << ")";
+            ossValues << ");";
+        }
+        else {
+            ossHeader << ", ";
+            ossValues << ", ";
+        }
+    }
 
-        /*
-        QSqlQuery query;
-        query.prepare(QString("INSERT INTO Book(id, Name, Pages, PublisherId, LanguageId, ShopId, IsRead, LastReadDate, Price, PurchasedDay, AddDate)) ") +
-                      QString("VALUES (:id, :Name, :Pages, :PublisherId, :LanguageId, :ShopId, :IsRead, :LastReadDate, :Price, :PurchasedDay, :AddDate)"));
+    /*
+    INSERT INTO table(c1,c2,...)
+        VALUES
+        (v11,v12,...),
+        (v21,v22,...),
+        ...
+        (vnn,vn2,...);
+    */
 
+    std::string queryString = ossHeader.str() + " " + ossValues.str();
+    ossHeader.clear();
+    ossValues.clear();
 
-        query.bindValue(":Name", QString::fromStdString(libib.Title()));
-        query.bindValue(":Pages", 1);
+    QSqlDatabase db = createConnection(QString("C:\\berk\\Documents\\Databases\\Alexandria\\SQLite\\Alexandria.db"));
+    db.transaction();
 
-        query.bindValue(":PublisherId", 1);
-        query.bindValue(":LanguageId", 1);
-        query.bindValue(":ShopId", 1);
-        query.bindValue(":IsRead", false);
-        query.bindValue(":LastReadDate", QString::fromStdString(std::to_string(libib.Completed().tm_wday) + std::to_string(libib.Completed().tm_mon) + std::to_string(libib.Completed().tm_year)));
-        query.bindValue(":Price", libib.Price());
-        query.bindValue(":PurchasedDay", QString::fromStdString(std::to_string(libib.PublishDate().tm_wday) + std::to_string(libib.PublishDate().tm_mon) + std::to_string(libib.PublishDate().tm_year)));
-        query.bindValue(":AddDate", QString::fromStdString(std::to_string(libib.Added().tm_wday) + std::to_string(libib.Added().tm_mon) + std::to_string(libib.Added().tm_year)));
+    QSqlQuery query(db);
+    for (int i = 1; i < wordLists.size(); ++i) {
+        query.prepare(QString::fromStdString(queryString));
 
-        query.exec();
-*/
+        for (int k = 1; k < columns.size(); ++k)
+            query.bindValue(QString::fromStdString(":" + columns[k]), QString::fromStdString(wordLists[i][k]));
+
+        if (!query.exec()) {
+            qWarning() << "-- QSqlQuery.exec() failed: " << query.lastError().text();
+            this->showMessageBox(QMessageBox::Critical, "Query error", "Cannot insert data !", QMessageBox::Ok, QMessageBox::Ok);
+            return;
+        }
+
+        query.clear();
+    }
+
+    if(!db.commit())
+        db.rollback();
+
 }
 
 
