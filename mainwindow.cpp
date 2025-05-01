@@ -154,16 +154,16 @@ CALLBACK void LibibCallback(Libib libib)
 
 PUBLIC_SLOT void MainWindow::newDatabase()
 {
-    if (!std::filesystem::is_directory(dbPath.toStdString()))
-        if (!std::filesystem::create_directory(dbPath.toStdString()))
+    if (!std::filesystem::is_directory(DEFAULT_DB_PATH))
+        if (!std::filesystem::create_directory(DEFAULT_DB_PATH))
             this->showMessageBox(QMessageBox::Critical, "Error", "Cannot create database file path !", QMessageBox::Ok, QMessageBox::Ok);
 
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Create database..."), dbPath, tr("SqLite File (*.db)"), nullptr, QFileDialog::DontUseNativeDialog);
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Create database..."), DEFAULT_DB_PATH, tr("SqLite File (*.db)"), nullptr, QFileDialog::DontUseNativeDialog);
     if (fileName.isEmpty())
         return;
 
     if (!std::filesystem::is_regular_file(fileName.toStdString())) {
-        int count = createDatabase(fileName);
+        int count = createDatabase(CREATESCRIPT_FILE, fileName);
 
         std::string msg = "Database " + std::filesystem::path(fileName.toStdString()).stem().string() + " with " + std::to_string(count) + " tables created.";
         this->statusBar()->showMessage(tr(msg.c_str()));
@@ -180,7 +180,7 @@ PUBLIC_SLOT void MainWindow::newDatabase()
 
 PUBLIC_SLOT void MainWindow::openDatabase()
 {
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), dbPath, tr("SqLite File (*.db)"), nullptr, QFileDialog::DontUseNativeDialog);
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), DEFAULT_DB_PATH, tr("SqLite File (*.db)"), nullptr, QFileDialog::DontUseNativeDialog);
     if (fileName.isEmpty())
         return;
 
@@ -322,7 +322,6 @@ PUBLIC_SLOT void MainWindow::importTsv()
 
     if(!db.commit())
         db.rollback();
-
 }
 
 

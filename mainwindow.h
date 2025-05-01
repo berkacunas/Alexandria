@@ -12,11 +12,11 @@
 
 #include <QStandardItemModel>
 
-#include "Libib.h"
 #include "libibparser.h"
 #include "libibcollection.h"
 
 #include "tsvparser.h"
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui {

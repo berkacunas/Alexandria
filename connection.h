@@ -12,18 +12,14 @@
 
 #include <sstream>
 
-static int createDatabase(const QString &dbname);
+static int createDatabase(const QString &createScriptFile, const QString &dbname);
 static QSqlDatabase createConnection(const QString &filename);
 static QStringList QSqlDatabaseDrivers();
 static int execSqlFromScriptFile(QSqlDatabase &db, const QString &filename);
 static bool createTable(const std::string &dbname, const std::string &tableName, const std::vector<std::string> &columns, bool dropTableIfExists = false);
 
-const QString genericDataLocation = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation); //AppDataLocation
-const QString dbPath = genericDataLocation + "/Alexandria/";
-const QString defaultDbName = dbPath + "Alexandria.db";
-const QString createTableScript = dbPath + "Alexandria.CreateTables.sql";
 
-static int createDatabase(const QString &dbname)
+static int createDatabase(const QString &createScriptFile, const QString &dbname)
 {
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName(dbname);
@@ -31,7 +27,7 @@ static int createDatabase(const QString &dbname)
     if (!db.isOpen())
         return 0;
 
-    return execSqlFromScriptFile(db, createTableScript);
+    return execSqlFromScriptFile(db, createScriptFile);
 }
 
 static QSqlDatabase createConnection(const QString &filename)
