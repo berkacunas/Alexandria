@@ -68,10 +68,14 @@ PUBLIC std::vector<std::vector<std::string>> TsvParser::parse(char delimeter, bo
             wordLists.push_back(wordList);
 
             if (i == 0) { // Create table.
+
                 _tableName = std::filesystem::path(_tsvFile).stem().string();
                 copy(wordList.begin(), wordList.end(), back_inserter(_columns));
-                if (!createTable(_dbFile, _tableName, _columns, dropTableIfExists)) ;
-                    // throw std::exception(("Cannot create table " + _tsvFile).c_str());
+
+                if (!checkIfTableExists(_dbFile, _tableName))
+                    if (!createTable(_dbFile, _tableName, _columns, dropTableIfExists))
+                        throw std::exception(("Cannot create table " + _tsvFile).c_str());
+
                 continue;
             }
 

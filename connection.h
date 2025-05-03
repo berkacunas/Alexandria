@@ -120,3 +120,25 @@ static bool createTable(const std::string &dbname, const std::string &tableName,
     return query.exec(QString::fromStdString(queryString));
 }
 
+static bool checkIfTableExists(const std::string &dbname, const std::string &tableName)
+{
+    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+    db.setDatabaseName(QString::fromStdString(dbname));
+    db.open();
+    if (!db.isOpen())
+        return false;
+
+    QSqlQuery query(db);
+    query.prepare(QString("SELECT count(name) FROM sqlite_schema WHERE type='table' AND name=:tableName;"));
+    query.bindValue(":tableName", QString::fromStdString(tableName));
+    query.exec();
+    query.next();
+
+    int count = query.value(0).toInt();
+
+    if (db.isOpen())
+        db.close();
+
+    return count > 0;
+}
+

@@ -3,6 +3,8 @@
 #include <fstream>
 #include <sstream>
 
+#include "globalvars.h"
+
 LibibParser::LibibParser(std::string csvFile)
 {
     _csvFile = csvFile;

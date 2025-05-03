@@ -5,7 +5,6 @@
 #include <vector>
 
 #include "Libib.h"
-#include "globalvars.h"
 
 class LibibParser
 {

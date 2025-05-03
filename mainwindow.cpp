@@ -9,8 +9,6 @@
 #include <sstream>
 
 #include "globalvars.h"
-#include "connection.h"
-#include "libibcollection.h"
 
 void ParseCallback(std::vector<std::string> wordList);
 void LibibCallback(Libib libib);
@@ -287,15 +285,6 @@ PUBLIC_SLOT void MainWindow::importTsv()
             ossValues << ", ";
         }
     }
-
-    /*
-    INSERT INTO table(c1,c2,...)
-        VALUES
-        (v11,v12,...),
-        (v21,v22,...),
-        ...
-        (vnn,vn2,...);
-    */
 
     std::string queryString = ossHeader.str() + " " + ossValues.str();
     ossHeader.clear();

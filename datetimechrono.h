@@ -1,9 +1,6 @@
 #ifndef DATETIMEPARSER_H
 #define DATETIMEPARSER_H
 
-
-#define _CRT_SECURE_NO_WARNINGS
-
 #include <chrono>
 #include <ctime>
 #include <sstream>

@@ -1,7 +1,7 @@
 #ifndef LIBIBCOLLECTION_H
 #define LIBIBCOLLECTION_H
 
-#define _CRT_SECURE_NO_WARNINGS
+
 
 #include <string>
 #include <vector>

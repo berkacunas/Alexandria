@@ -12,10 +12,11 @@
 
 #include <QStandardItemModel>
 
+#include "connection.h"
 #include "libibparser.h"
 #include "libibcollection.h"
-
 #include "tsvparser.h"
+
 
 
 QT_BEGIN_NAMESPACE
