@@ -63,7 +63,10 @@ PUBLIC std::vector<std::vector<std::string>> TsvParser::parse(char delimeter, bo
 
         std::cout << "File " << _tsvFile << " opened.";
 
-        for (int i = 0; getline(ifs, line) && line.c_str()[0] != '\0'; ++i) {
+        for (int i = 0; getline(ifs, line, del); ++i) {
+            if (i == 31)
+                qDebug() << "Line: " << line;
+
             wordList = this->getWordList(line, del);
             wordLists.push_back(wordList);
 
@@ -99,14 +102,19 @@ PRIVATE std::vector<std::string> TsvParser::getWordList(std::string line, char d
     bool inQuotes = false;
 
     for (int k = 0; k < line.size(); ++k) {
+        if (k == 290)
+            qDebug() << "Catching a bug";
         if (!inQuotes && line[k] == del) {
             wordList.push_back(word);
             word.clear();
         }
-        else if (line[k] == '"')
+        else if (line[k] == '"' && del != '|')  //if csv field separator is "|", quotes will not be taken into account.
             inQuotes = !inQuotes;
-        else
+        else {
             word += line[k];
+            if (k == 290)
+                qDebug() << word;
+        }
     }
 
     wordList.push_back(word); // for last word.

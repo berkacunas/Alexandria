@@ -287,6 +287,8 @@ PUBLIC_SLOT void MainWindow::importTsv()
     }
 
     std::string queryString = ossHeader.str() + " " + ossValues.str();
+    qDebug() << queryString;
+
     ossHeader.clear();
     ossValues.clear();
 
@@ -294,15 +296,22 @@ PUBLIC_SLOT void MainWindow::importTsv()
     db.transaction();
 
     QSqlQuery query(db);
+
+
+    qDebug() << "WordLists size: " << wordLists.size();
     for (int i = 1; i < wordLists.size(); ++i) {
         query.prepare(QString::fromStdString(queryString));
 
-        for (int k = 1; k < columns.size(); ++k)
+        qDebug() << "Column size: " << columns.size();
+        for (int k = 1; k < columns.size(); ++k) {
+            qDebug() << "i:" << i << " k: " << k << " Column: " << columns[k] << " Value: " << wordLists[i][k];
             query.bindValue(QString::fromStdString(":" + columns[k]), QString::fromStdString(wordLists[i][k]));
+        }
 
         if (!query.exec()) {
-            qWarning() << "-- QSqlQuery.exec() failed: " << query.lastError().text();
-            this->showMessageBox(QMessageBox::Critical, "Query error", "Cannot insert data !", QMessageBox::Ok, QMessageBox::Ok);
+            QString errorMessage = "-- QSqlQuery.exec() failed: " + query.lastError().text();
+            qWarning() << errorMessage;
+            this->showMessageBox(QMessageBox::Critical, "Query error", errorMessage, QMessageBox::Ok, QMessageBox::Ok);
             return;
         }
 
