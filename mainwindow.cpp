@@ -8,7 +8,7 @@
 
 #include "globalvars.h"
 #include "connection.h"
-#include "LibibCollection.h"
+#include "libibcollection.h"
 
 void libib_parse_callback(std::vector<std::string> wordList);
 
