@@ -1,6 +1,5 @@
 #include "libibcollection.h"
 
-#include <cstdlib>
 #include "globalvars.h"
 
 std::string listToStr(std::vector<std::string> list)
